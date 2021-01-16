@@ -51,4 +51,7 @@ module.exports = {
         chunks: false,
         modules: false,
     },
+    output: {
+        publicPath: '',
+    },
 };
