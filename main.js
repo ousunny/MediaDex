@@ -1,13 +1,33 @@
 const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
+const { Sequelize } = require('sequelize');
+
+const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: `${app.getPath('userData')}/database.sqlite`,
+});
 
 let mainWindow;
 let isDev = false;
 
 process.env.NODE_ENV === 'development' ? (isDev = true) : (isDev = false);
 
-function createMainWindow() {
+const models = {
+    Series: require('./src/database/models/Series')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
+};
+
+async function createMainWindow() {
+    try {
+        await sequelize.authenticate();
+        await sequelize.sync();
+    } catch (err) {
+        console.error('Cannot connect to db');
+    }
+
     mainWindow = new BrowserWindow({
         width: isDev ? 1400 : 1100,
         height: 800,
