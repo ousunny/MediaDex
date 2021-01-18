@@ -32,6 +32,7 @@ async function createMainWindow() {
         width: isDev ? 1400 : 1100,
         height: 800,
         show: false,
+        opacity: 0.98,
         webPreferences: {
             nodeIntegration: true,
         },
