@@ -29,7 +29,7 @@ async function createMainWindow() {
     }
 
     mainWindow = new BrowserWindow({
-        width: isDev ? 1400 : 1100,
+        width: isDev ? 1600 : 1100,
         height: 800,
         show: false,
         opacity: 0.98,
