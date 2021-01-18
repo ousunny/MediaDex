@@ -11,8 +11,12 @@ import {
     List,
     ListItem,
     ListItemText,
+    Fade,
 } from '@material-ui/core';
 import SearchBar from './SearchBar';
+import Home from './Home';
+import Bookmarks from './Bookmarks';
+import Browse from './Browse';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -50,12 +54,20 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(3),
         flexGrow: 1,
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
+    },
+    searchBar: {
+        margin: '1rem 2rem',
     },
 }));
 
 const App = () => {
     const classes = useStyles();
+    const [nav, setNav] = React.useState(0);
+
+    const handleNavClick = (index) => {
+        setNav(index);
+    };
 
     return (
         <ThemeProvider className={classes.root} theme={darkTheme}>
@@ -71,7 +83,12 @@ const App = () => {
                 </Typography>
                 <List className={classes.nav}>
                     {['Home', 'Bookmarks', 'Browse'].map((text, index) => (
-                        <ListItem button key={text}>
+                        <ListItem
+                            button
+                            key={text}
+                            value={index}
+                            onClick={() => handleNavClick(index)}
+                        >
                             <ListItemText
                                 classes={{ primary: classes.navItems }}
                                 primary={text}
@@ -81,7 +98,11 @@ const App = () => {
                 </List>
             </Drawer>
             <main className={classes.content}>
-                <SearchBar />
+                <div className={classes.searchBar}>
+                    <SearchBar />
+                </div>
+
+                {nav === 0 ? <Home /> : nav === 1 ? <Bookmarks /> : <Browse />}
             </main>
         </ThemeProvider>
     );

@@ -5,7 +5,7 @@ import { Search } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     search: {
-        width: '80%',
+        width: '100%',
         display: 'flex',
         position: 'relative',
     },
