@@ -7,12 +7,12 @@ import {
 import {
     CssBaseline,
     Typography,
-    Container,
     Drawer,
     List,
     ListItem,
     ListItemText,
 } from '@material-ui/core';
+import SearchBar from './SearchBar';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -21,7 +21,10 @@ const darkTheme = createMuiTheme({
 });
 
 const drawerWidth = '240px';
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+    },
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
@@ -43,36 +46,43 @@ const useStyles = makeStyles(() => ({
         fontSize: '2rem',
         textAlign: 'right',
     },
+    content: {
+        padding: theme.spacing(3),
+        flexGrow: 1,
+        display: 'flex',
+        justifyContent: 'center',
+    },
 }));
 
 const App = () => {
     const classes = useStyles();
 
     return (
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider className={classes.root} theme={darkTheme}>
             <CssBaseline />
-            <Container>
-                <Drawer
-                    className={classes.drawer}
-                    variant="permanent"
-                    anchor="left"
-                    classes={{ paper: classes.drawerPaper }}
-                >
-                    <Typography className={classes.logo} variant="h1">
-                        MediaDex
-                    </Typography>
-                    <List className={classes.nav}>
-                        {['Home', 'Bookmarks', 'Browse'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemText
-                                    classes={{ primary: classes.navItems }}
-                                    primary={text}
-                                />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Drawer>
-            </Container>
+            <Drawer
+                className={classes.drawer}
+                variant="permanent"
+                anchor="left"
+                classes={{ paper: classes.drawerPaper }}
+            >
+                <Typography className={classes.logo} variant="h1">
+                    MediaDex
+                </Typography>
+                <List className={classes.nav}>
+                    {['Home', 'Bookmarks', 'Browse'].map((text, index) => (
+                        <ListItem button key={text}>
+                            <ListItemText
+                                classes={{ primary: classes.navItems }}
+                                primary={text}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </Drawer>
+            <main className={classes.content}>
+                <SearchBar />
+            </main>
         </ThemeProvider>
     );
 };
