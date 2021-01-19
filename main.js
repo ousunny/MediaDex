@@ -2,6 +2,7 @@ const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize } = require('sequelize');
+const { ipcMain, dialog } = require('electron');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -20,6 +21,7 @@ const models = {
     ),
 };
 
+//#region MainWindow
 async function createMainWindow() {
     try {
         await sequelize.authenticate();
@@ -64,6 +66,25 @@ async function createMainWindow() {
 
     mainWindow.on('closed', () => (mainWindow = null));
 }
+//#endregion
+
+//#region ipcMain
+ipcMain.on('media:click', async (event, arg) => {
+    let properties;
+    arg === 'series'
+        ? (properties = ['openDirectory'])
+        : (properties = ['openFile']);
+
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties,
+    });
+
+    mainWindow.webContents.send(
+        'media:select',
+        JSON.stringify(result.filePaths)
+    );
+});
+//#endregion
 
 app.on('ready', () => {
     createMainWindow();
