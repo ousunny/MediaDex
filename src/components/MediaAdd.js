@@ -20,28 +20,45 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const types = [
-    { media: 'series', label: 'Series' },
-    { media: 'episode', label: 'Episode' },
-    { media: 'movie', label: 'Movie' },
+    { value: 'series', label: 'Series' },
+    { value: 'episode', label: 'Episode' },
+    { value: 'movie', label: 'Movie' },
+];
+
+const seasons = [
+    { value: 'winter', label: 'Winter' },
+    { value: 'spring', label: 'Spring' },
+    { value: 'summer', label: 'Summer' },
+    { value: 'fall', label: 'Fall' },
 ];
 
 const MediaAdd = ({ open, onClose }) => {
     const classes = useStyles();
     const [type, setType] = useState('series');
+    const [season, setSeason] = useState('winter');
+    const [year, setYear] = useState(new Date().getFullYear());
     const [mediaPath, setMediaPath] = useState('');
     const [tags, setTags] = useState([]);
 
-    useEffect(() => {}, []);
-
-    //#region ipcRenderer
-    ipcRenderer.on('media:select', (event, paths) => {
-        setMediaPath(JSON.parse(paths)[0]);
-    });
-    //#endregion
+    useEffect(() => {
+        //#region ipcRenderer
+        ipcRenderer.on('media:select', (event, paths) => {
+            setMediaPath(JSON.parse(paths)[0]);
+        });
+        //#endregion
+    }, []);
 
     //#region Events
     const handleTypeChange = (event) => {
         setType(event.target.value);
+    };
+
+    const handleSeasonChange = (event) => {
+        setSeason(event.target.value);
+    };
+
+    const handleYearChange = (event) => {
+        setYear(event.target.value);
     };
 
     const handleMediaClick = (event) => {
@@ -115,11 +132,38 @@ const MediaAdd = ({ open, onClose }) => {
                             helperText="Type of Media"
                         >
                             {types.map((type) => (
-                                <MenuItem key={type.media} value={type.media}>
+                                <MenuItem key={type.value} value={type.value}>
                                     {type.label}
                                 </MenuItem>
                             ))}
                         </TextField>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            select
+                            fullWidth
+                            value={season}
+                            onChange={handleSeasonChange}
+                            helperText="Season"
+                        >
+                            {seasons.map((season) => (
+                                <MenuItem
+                                    key={season.value}
+                                    value={season.value}
+                                >
+                                    {season.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            type="number"
+                            fullWidth
+                            value={year}
+                            onChange={handleYearChange}
+                            helperText="Year"
+                        ></TextField>
                     </Grid>
                     <Grid item xs={4}>
                         <Button
