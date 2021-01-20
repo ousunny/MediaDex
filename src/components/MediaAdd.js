@@ -38,6 +38,7 @@ const MediaAdd = ({ open, onClose }) => {
     const [season, setSeason] = useState('winter');
     const [year, setYear] = useState(new Date().getFullYear());
     const [mediaPath, setMediaPath] = useState('');
+    const [summary, setSummary] = useState('');
     const [tags, setTags] = useState([]);
 
     useEffect(() => {
@@ -63,6 +64,10 @@ const MediaAdd = ({ open, onClose }) => {
 
     const handleMediaClick = (event) => {
         ipcRenderer.send('media:click', type);
+    };
+
+    const handleSummaryChange = (event) => {
+        setSummary(event.target.value);
     };
 
     const handleTagDone = (event) => {
@@ -184,6 +189,16 @@ const MediaAdd = ({ open, onClose }) => {
                         />
                     </Grid>
                     <Grid item xs={12}>
+                        <TextField
+                            multiline
+                            fullWidth
+                            rows={4}
+                            value={summary}
+                            onChange={handleSummaryChange}
+                            helperText="Summary"
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
                         <Autocomplete
                             multiple
                             options={tags}
@@ -193,7 +208,7 @@ const MediaAdd = ({ open, onClose }) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    placeholder="tags"
+                                    helperText="Tags"
                                     variant="standard"
                                 />
                             )}
