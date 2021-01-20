@@ -35,8 +35,9 @@ const seasons = [
 const MediaAdd = ({ open, onClose }) => {
     const classes = useStyles();
     const [type, setType] = useState('series');
-    const [season, setSeason] = useState('winter');
-    const [year, setYear] = useState(new Date().getFullYear());
+    const [currentSeason, setCurrentSeason] = useState(1);
+    const [airingSeason, setAiringSeason] = useState('winter');
+    const [airingYear, setAiringYear] = useState(new Date().getFullYear());
     const [mediaPath, setMediaPath] = useState('');
     const [summary, setSummary] = useState('');
     const [tags, setTags] = useState([]);
@@ -54,12 +55,16 @@ const MediaAdd = ({ open, onClose }) => {
         setType(event.target.value);
     };
 
-    const handleSeasonChange = (event) => {
-        setSeason(event.target.value);
+    const handleCurrentSeasonChange = (event) => {
+        setCurrentSeason(event.target.value);
     };
 
-    const handleYearChange = (event) => {
-        setYear(event.target.value);
+    const handleAiringSeasonChange = (event) => {
+        setAiringSeason(event.target.value);
+    };
+
+    const handleAiringYearChange = (event) => {
+        setAiringYear(event.target.value);
     };
 
     const handleMediaClick = (event) => {
@@ -143,13 +148,22 @@ const MediaAdd = ({ open, onClose }) => {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
+                        <TextField
+                            type="number"
+                            fullWidth
+                            value={currentSeason}
+                            onChange={handleCurrentSeasonChange}
+                            helperText="Current Season"
+                        ></TextField>
+                    </Grid>
+                    <Grid item xs={4}>
                         <TextField
                             select
                             fullWidth
-                            value={season}
-                            onChange={handleSeasonChange}
-                            helperText="Season"
+                            value={airingSeason}
+                            onChange={handleAiringSeasonChange}
+                            helperText="Airing Season"
                         >
                             {seasons.map((season) => (
                                 <MenuItem
@@ -161,13 +175,13 @@ const MediaAdd = ({ open, onClose }) => {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={4}>
                         <TextField
                             type="number"
                             fullWidth
-                            value={year}
-                            onChange={handleYearChange}
-                            helperText="Year"
+                            value={airingYear}
+                            onChange={handleAiringYearChange}
+                            helperText="Airing Year"
                         ></TextField>
                     </Grid>
                     <Grid item xs={4}>
