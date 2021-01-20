@@ -1,26 +1,19 @@
 module.exports = (sequelize, DataTypes) => {
-    const Series = sequelize.define(
-        'series',
+    const Tags = sequelize.define(
+        'tags',
         {
             id: {
                 type: DataTypes.INTEGER,
+                autoIncrement: true,
                 primaryKey: true,
-            },
-            title: {
-                type: DataTypes.STRING,
                 allowNull: false,
             },
-            airing_season: {
+            tag_name: {
                 type: DataTypes.STRING,
-                allowNull: false,
-            },
-            airing_year: {
-                type: DataTypes.INTEGER,
                 allowNull: false,
             },
         },
         { underscored: true, timestamps: false }
     );
-
-    return Series;
+    return Tags;
 };

@@ -1,26 +1,24 @@
 module.exports = (sequelize, DataTypes) => {
-    const Series = sequelize.define(
-        'series',
+    const SeriesSeasons = sequelize.define(
+        'series_seasons',
         {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
             },
-            title: {
-                type: DataTypes.STRING,
+            series_id: {
+                type: DataTypes.INTEGER,
                 allowNull: false,
             },
-            airing_season: {
+            summary: {
                 type: DataTypes.STRING,
-                allowNull: false,
             },
-            airing_year: {
+            current_season: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
         },
         { underscored: true, timestamps: false }
     );
-
-    return Series;
+    return SeriesSeasons;
 };

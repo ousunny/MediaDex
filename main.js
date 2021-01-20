@@ -14,20 +14,71 @@ let isDev = false;
 
 process.env.NODE_ENV === 'development' ? (isDev = true) : (isDev = false);
 
+//#region Sequelize
 const models = {
     Series: require('./src/database/models/Series')(
         sequelize,
         Sequelize.DataTypes
     ),
+    Episodes: require('./src/database/models/Episodes')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
+    Tags: require('./src/database/models/Tags')(sequelize, Sequelize.DataTypes),
+    SeriesAccesses: require('./src/database/models/SeriesAccesses')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
+    SeriesEpisodes: require('./src/database/models/SeriesEpisodes')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
+    SeriesSeasons: require('./src/database/models/SeriesSeasons')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
+    SeriesTags: require('./src/database/models/SeriesTags')(
+        sequelize,
+        Sequelize.DataTypes
+    ),
 };
+
+models.Series.hasMany(models.SeriesAccesses, {
+    foreignKey: 'series_id',
+    sourceKey: 'id',
+});
+models.Series.hasMany(models.SeriesEpisodes, {
+    foreignKey: 'series_id',
+    sourceKey: 'id',
+});
+models.Episodes.hasMany(models.SeriesEpisodes, {
+    foreignKey: 'episode_id',
+    sourceKey: 'id',
+});
+models.Series.hasMany(models.SeriesSeasons, {
+    foreignKey: 'series_id',
+    sourceKey: 'id',
+});
+models.Tags.hasMany(models.SeriesTags, {
+    foreignKey: 'tag_id',
+    sourceKey: 'id',
+});
+models.Series.hasMany(models.SeriesTags, {
+    foreignKey: 'series_id',
+    sourceKey: 'id',
+});
+//#endregion
 
 //#region MainWindow
 async function createMainWindow() {
     try {
         await sequelize.authenticate();
-        await sequelize.sync();
+        await sequelize.query('PRAGMA foreign_keys=false;');
+        await sequelize.sync({ force: true });
+        await sequelize.query('PRAGMA foreign_keys=true;');
     } catch (err) {
         console.error('Cannot connect to db');
+        console.log(err);
     }
 
     mainWindow = new BrowserWindow({
