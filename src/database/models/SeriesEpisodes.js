@@ -6,11 +6,23 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 primaryKey: true,
+                references: {
+                    model: 'series',
+                    key: 'id',
+                },
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
             },
             episode_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 primaryKey: true,
+                references: {
+                    model: 'episodes',
+                    key: 'id',
+                },
+                onDelete: 'CASCADE',
+                onUpdate: 'CASCADE',
             },
         },
         { underscored: true, timestamps: false }

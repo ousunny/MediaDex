@@ -42,31 +42,6 @@ const models = {
         Sequelize.DataTypes
     ),
 };
-
-models.Series.hasMany(models.SeriesAccesses, {
-    foreignKey: 'series_id',
-    sourceKey: 'id',
-});
-models.Series.hasMany(models.SeriesEpisodes, {
-    foreignKey: 'series_id',
-    sourceKey: 'id',
-});
-models.Episodes.hasMany(models.SeriesEpisodes, {
-    foreignKey: 'episode_id',
-    sourceKey: 'id',
-});
-models.Series.hasMany(models.SeriesSeasons, {
-    foreignKey: 'series_id',
-    sourceKey: 'id',
-});
-models.Tags.hasMany(models.SeriesTags, {
-    foreignKey: 'tag_id',
-    sourceKey: 'id',
-});
-models.Series.hasMany(models.SeriesTags, {
-    foreignKey: 'series_id',
-    sourceKey: 'id',
-});
 //#endregion
 
 //#region MainWindow
