@@ -3,6 +3,7 @@ const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize } = require('sequelize');
 const { ipcMain, dialog } = require('electron');
+const Series = require('./src/database/models/Series');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -95,6 +96,17 @@ async function createMainWindow() {
 //#endregion
 
 //#region ipcMain
+ipcMain.on('series:load', sendSeries);
+
+ipcMain.on('series:add', async (e, show) => {
+    try {
+        await models.Series.create(show);
+        sendSeries();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('media:click', async (event, arg) => {
     let properties;
     arg === 'series'
@@ -111,6 +123,16 @@ ipcMain.on('media:click', async (event, arg) => {
     );
 });
 //#endregion
+
+async function sendSeries() {
+    try {
+        const series = await models.Series.findAll();
+        console.log(series);
+        mainWindow.webContents.send('series:get', JSON.stringify(series));
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 app.on('ready', () => {
     createMainWindow();
