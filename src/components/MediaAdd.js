@@ -102,11 +102,19 @@ const MediaAdd = ({ open, onClose }) => {
             summary,
             tags,
         };
+
         ipcRenderer.send('series:add', {
             ...show,
             airing_season: airingSeason,
             airing_year: airingYear,
         });
+
+        setTitle('');
+        setMediaPath('');
+        setSummary('');
+        setTags([]);
+
+        onClose();
     };
     //#endregion
 
