@@ -34,6 +34,7 @@ const seasons = [
 
 const MediaAdd = ({ open, onClose }) => {
     const classes = useStyles();
+    const [title, setTitle] = useState('');
     const [type, setType] = useState('series');
     const [currentSeason, setCurrentSeason] = useState(1);
     const [airingSeason, setAiringSeason] = useState('winter');
@@ -51,6 +52,10 @@ const MediaAdd = ({ open, onClose }) => {
     }, []);
 
     //#region Events
+    const handleTitleChange = (event) => {
+        setTitle(event.target.value);
+    };
+
     const handleTypeChange = (event) => {
         setType(event.target.value);
     };
@@ -86,7 +91,23 @@ const MediaAdd = ({ open, onClose }) => {
         onClose();
     };
 
-    const handleSave = () => {};
+    const handleSave = () => {
+        const show = {
+            title,
+            type,
+            currentSeason,
+            airingSeason,
+            airingYear,
+            mediaPath,
+            summary,
+            tags,
+        };
+        ipcRenderer.send('series:add', {
+            ...show,
+            airing_season: airingSeason,
+            airing_year: airingYear,
+        });
+    };
     //#endregion
 
     return (
@@ -104,6 +125,8 @@ const MediaAdd = ({ open, onClose }) => {
                             <TextField
                                 autoFocus
                                 fullWidth
+                                value={title}
+                                onChange={handleTitleChange}
                                 placeholder="Series Title..."
                             />
                         </Grid>
@@ -113,6 +136,8 @@ const MediaAdd = ({ open, onClose }) => {
                                 <TextField
                                     autoFocus
                                     fullWidth
+                                    value={title}
+                                    onChange={handleTitleChange}
                                     placeholder="Episode Title..."
                                 />
                             </Grid>
@@ -129,6 +154,8 @@ const MediaAdd = ({ open, onClose }) => {
                             <TextField
                                 autoFocus
                                 fullWidth
+                                value={title}
+                                onChange={handleTitleChange}
                                 placeholder="Movie Title..."
                             />
                         </Grid>
