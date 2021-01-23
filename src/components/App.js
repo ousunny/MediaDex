@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import {
     makeStyles,
     ThemeProvider,
@@ -19,6 +19,8 @@ import Home from './Home';
 import Bookmarks from './Bookmarks';
 import Browse from './Browse';
 import MediaAdd from './MediaAdd';
+import SeriesDetailView from './SeriesDetailView';
+import { ipcRenderer } from 'electron';
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -78,10 +80,22 @@ const useStyles = makeStyles((theme) => ({
 
 const App = () => {
     const classes = useStyles();
-    const [nav, setNav] = React.useState(0);
-    const [addOpen, setAddOpen] = React.useState(false);
+    const [series, setSeries] = useState([]);
+    const [nav, setNav] = useState(0);
+    const [addOpen, setAddOpen] = useState(false);
+    const [detailView, setDetailView] = useState(false);
+
+    useEffect(() => {
+        ipcRenderer.send('series:load');
+
+        ipcRenderer.on('series:get', (e, series) => {
+            setSeries(JSON.parse(series));
+            console.log(series);
+        });
+    }, []);
 
     const handleNavClick = (index) => {
+        setDetailView(false);
         setNav(index);
     };
 
@@ -89,8 +103,13 @@ const App = () => {
         addOpen ? setAddOpen(false) : setAddOpen(true);
     };
 
+    function displayDetailView(display) {
+        console.log(display);
+        setDetailView(true);
+    }
+
     return (
-        <ThemeProvider className={classes.root} theme={darkTheme}>
+        <ThemeProvider theme={darkTheme}>
             <CssBaseline />
             <Drawer
                 className={classes.drawer}
@@ -107,6 +126,7 @@ const App = () => {
                             button
                             key={text}
                             value={index}
+                            selected={index === nav ? true : false}
                             onClick={() => handleNavClick(index)}
                         >
                             <ListItemText
@@ -118,16 +138,36 @@ const App = () => {
                 </List>
             </Drawer>
             <main className={classes.content}>
-                <div className={classes.actions}>
-                    <div className={classes.searchBar}>
-                        <SearchBar />
-                    </div>
-                    <Button className={classes.add} onClick={handleAddClick}>
-                        <Add />
-                    </Button>
-                </div>
+                {!detailView ? (
+                    <Fragment>
+                        <div className={classes.actions}>
+                            <div className={classes.searchBar}>
+                                <SearchBar />
+                            </div>
+                            <Button
+                                className={classes.add}
+                                onClick={handleAddClick}
+                            >
+                                <Add />
+                            </Button>
+                        </div>
 
-                {nav === 0 ? <Home /> : nav === 1 ? <Bookmarks /> : <Browse />}
+                        {nav === 0 ? (
+                            <Home
+                                series={series}
+                                displayDetailView={displayDetailView}
+                            />
+                        ) : nav === 1 ? (
+                            <Bookmarks series={series} />
+                        ) : (
+                            <Browse series={series} />
+                        )}
+                    </Fragment>
+                ) : (
+                    <Fragment>
+                        <SeriesDetailView />
+                    </Fragment>
+                )}
             </main>
 
             <MediaAdd open={addOpen} onClose={handleAddClick} />
