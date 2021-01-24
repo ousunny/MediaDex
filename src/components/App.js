@@ -104,7 +104,6 @@ const App = () => {
     };
 
     function displayDetailView(display) {
-        console.log(display);
         setDetailView(true);
     }
 
@@ -144,6 +143,7 @@ const App = () => {
                             <div className={classes.searchBar}>
                                 <SearchBar />
                             </div>
+
                             <Button
                                 className={classes.add}
                                 onClick={handleAddClick}
