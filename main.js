@@ -1,7 +1,7 @@
 const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const { ipcMain, dialog } = require('electron');
 const Series = require('./src/database/models/Series');
 
@@ -43,6 +43,8 @@ const models = {
         Sequelize.DataTypes
     ),
 };
+
+models.Series.hasOne(models.SeriesAccesses);
 //#endregion
 
 //#region MainWindow
@@ -96,12 +98,22 @@ async function createMainWindow() {
 //#endregion
 
 //#region ipcMain
-ipcMain.on('series:load', sendSeries);
+ipcMain.on('series:load_home', () => {
+    sendLatestSeries(4);
+});
 
 ipcMain.on('series:add', async (e, show) => {
     try {
-        await models.Series.create(show);
-        sendSeries();
+        await models.Series.create({
+            title: show.title,
+            airing_season: show.airing_season,
+            airing_year: show.airing_year,
+        }).then(async (series) => {
+            await models.SeriesAccesses.create({
+                series_id: series.id,
+            });
+        });
+        sendLatestSeries(4);
     } catch (err) {
         console.log(err);
     }
@@ -124,11 +136,33 @@ ipcMain.on('media:click', async (event, arg) => {
 });
 //#endregion
 
-async function sendSeries() {
+async function sendAllSeries() {
     try {
         const series = await models.Series.findAll();
         console.log(series);
         mainWindow.webContents.send('series:get', JSON.stringify(series));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendLatestSeries(amount) {
+    try {
+        const series = await models.Series.findAll({
+            limit: amount,
+            include: [
+                {
+                    model: models.SeriesAccesses,
+                    required: true,
+                },
+            ],
+            order: [[models.SeriesAccesses, 'updated_at', 'DESC']],
+        });
+        console.log(series.updated_at);
+        mainWindow.webContents.send(
+            'series:get_latest',
+            JSON.stringify(series)
+        );
     } catch (err) {
         console.log(err);
     }
