@@ -30,10 +30,6 @@ const models = {
         sequelize,
         Sequelize.DataTypes
     ),
-    SeriesEpisodes: require('./src/database/models/SeriesEpisodes')(
-        sequelize,
-        Sequelize.DataTypes
-    ),
     SeriesSeasons: require('./src/database/models/SeriesSeasons')(
         sequelize,
         Sequelize.DataTypes
@@ -44,7 +40,11 @@ const models = {
     ),
 };
 
-models.Series.hasOne(models.SeriesAccesses);
+models.Series.hasOne(models.SeriesAccesses, { foreignKey: 'series_id' });
+models.Series.hasMany(models.Episodes, { foreignKey: 'series_id' });
+models.Series.hasMany(models.SeriesSeasons, { foreignKey: 'series_id' });
+models.Series.belongsToMany(models.Tags, { through: models.SeriesTags });
+models.Tags.belongsToMany(models.Series, { through: models.SeriesTags });
 //#endregion
 
 //#region MainWindow
