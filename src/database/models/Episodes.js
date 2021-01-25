@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
+            series_id: {
+                type: DataTypes.INTEGER,
+            },
         },
         { underscored: true, timestamps: false }
     );

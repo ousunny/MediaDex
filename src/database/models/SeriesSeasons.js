@@ -9,12 +9,6 @@ module.exports = (sequelize, DataTypes) => {
             series_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                references: {
-                    model: 'series',
-                    key: 'id',
-                },
-                onDelete: 'CASCADE',
-                onUpdate: 'CASCADE',
             },
             summary: {
                 type: DataTypes.STRING,
