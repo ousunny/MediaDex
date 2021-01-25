@@ -152,7 +152,8 @@ const MediaAdd = ({ open, onClose }) => {
                                     fullWidth
                                     value={title}
                                     onChange={handleTitleChange}
-                                    placeholder="Series Title..."
+                                    placeholder="Title..."
+                                    helperText="Series Title (Required)"
                                 />
                             </Grid>
                         ) : type === 'episode' ? (
@@ -181,7 +182,8 @@ const MediaAdd = ({ open, onClose }) => {
                                     fullWidth
                                     value={title}
                                     onChange={handleTitleChange}
-                                    placeholder="Movie Title..."
+                                    placeholder="Title..."
+                                    helperText="Movie Title (Required)"
                                 />
                             </Grid>
                         )}
@@ -210,7 +212,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 fullWidth
                                 value={currentSeason}
                                 onChange={handleCurrentSeasonChange}
-                                helperText="Current Season"
+                                helperText="Current Season (Required)"
                             ></TextField>
                         </Grid>
                         <Grid item xs={4}>
@@ -238,7 +240,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 fullWidth
                                 value={airingYear}
                                 onChange={handleAiringYearChange}
-                                helperText="Airing Year"
+                                helperText="Airing Year (Required)"
                             ></TextField>
                         </Grid>
                         <Grid item xs={4}>
