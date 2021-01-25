@@ -80,11 +80,8 @@ const MediaAdd = ({ open, onClose }) => {
         setSummary(event.target.value);
     };
 
-    const handleTagDone = (event) => {
-        if (event.keyCode === 13 && event.target.value) {
-            setTags([...tags, event.target.value]);
-            console.log(tags);
-        }
+    const handleTagDone = (event, options, reason) => {
+        setTags(options);
     };
 
     const handleClose = () => {
@@ -254,7 +251,7 @@ const MediaAdd = ({ open, onClose }) => {
                             options={tags}
                             fullWidth
                             freeSolo
-                            onKeyDown={handleTagDone}
+                            onChange={handleTagDone}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}

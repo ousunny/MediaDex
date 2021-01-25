@@ -121,6 +121,28 @@ ipcMain.on('series:add', async (e, show) => {
                 summary: show.summary,
                 current_season: show.current_season,
             });
+
+            if (show.tags.length > 0) {
+                const tags = show.tags.map((tag) => ({ tag_name: tag }));
+                await models.Tags.bulkCreate(tags, {
+                    fields: ['tag_name'],
+                    updateOnDuplicate: ['tag_name'],
+                }).then(async () => {
+                    const foundTags = await models.Tags.findAll({
+                        where: { tag_name: show.tags },
+                        attributes: ['id'],
+                    });
+
+                    const tagIds = foundTags.map((foundTag) => ({
+                        series_id: series.id,
+                        tag_id: foundTag.id,
+                    }));
+
+                    await models.SeriesTags.bulkCreate(tagIds, {
+                        updateOnDuplicate: ['tag_id'],
+                    });
+                });
+            }
         });
         sendLatestSeries(4);
     } catch (err) {
@@ -167,7 +189,7 @@ async function sendLatestSeries(amount) {
             ],
             order: [[models.SeriesAccesses, 'updated_at', 'DESC']],
         });
-        console.log(series.updated_at);
+
         mainWindow.webContents.send(
             'series:get_latest',
             JSON.stringify(series)

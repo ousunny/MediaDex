@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 autoIncrement: true,
                 primaryKey: true,
-                allowNull: false,
             },
             tag_name: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
             },
         },
         { underscored: true, timestamps: false }
