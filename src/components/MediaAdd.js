@@ -105,6 +105,7 @@ const MediaAdd = ({ open, onClose }) => {
 
         ipcRenderer.send('series:add', {
             ...show,
+            current_season: currentSeason,
             airing_season: airingSeason,
             airing_year: airingYear,
         });

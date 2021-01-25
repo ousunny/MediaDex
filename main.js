@@ -112,6 +112,11 @@ ipcMain.on('series:add', async (e, show) => {
             await models.SeriesAccesses.create({
                 series_id: series.id,
             });
+            await models.SeriesSeasons.create({
+                series_id: series.id,
+                summary: show.summary,
+                current_season: show.current_season,
+            });
         });
         sendLatestSeries(4);
     } catch (err) {
