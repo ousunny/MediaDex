@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
+            image_location: {
+                type: DataTypes.STRING,
+            },
             summary: {
                 type: DataTypes.STRING,
             },

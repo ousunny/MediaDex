@@ -10,6 +10,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
+            location: {
+                type: DataTypes.STRING,
+            },
             series_id: {
                 type: DataTypes.INTEGER,
             },
