@@ -87,7 +87,7 @@ const App = () => {
     const [detailView, setDetailView] = useState(false);
 
     useEffect(() => {
-        ipcRenderer.send('series:load_home');
+        ipcRenderer.send('series:load', nav);
 
         ipcRenderer.on('series:get', (e, series) => {
             setSeries(JSON.parse(series));
@@ -101,6 +101,7 @@ const App = () => {
 
     const handleNavClick = (index) => {
         setDetailView(false);
+        ipcRenderer.send('series:load', index);
         setNav(index);
     };
 

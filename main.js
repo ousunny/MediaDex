@@ -98,8 +98,12 @@ async function createMainWindow() {
 //#endregion
 
 //#region ipcMain
-ipcMain.on('series:load_home', () => {
-    sendLatestSeries(4);
+ipcMain.on('series:load', (e, nav) => {
+    switch (nav) {
+        case 0:
+            sendLatestSeries(4);
+            break;
+    }
 });
 
 ipcMain.on('series:add', async (e, show) => {
