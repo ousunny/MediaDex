@@ -144,10 +144,22 @@ ipcMain.on('series:add', async (e, show) => {
                 });
             }
         });
+
         sendLatestSeries(4);
     } catch (err) {
         console.log(err);
     }
+});
+
+ipcMain.on('image:click', async (event, arg) => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+    });
+
+    mainWindow.webContents.send(
+        'image:select',
+        JSON.stringify(result.filePaths)
+    );
 });
 
 ipcMain.on('media:click', async (event, arg) => {
@@ -165,6 +177,7 @@ ipcMain.on('media:click', async (event, arg) => {
         JSON.stringify(result.filePaths)
     );
 });
+
 //#endregion
 
 async function sendAllSeries() {

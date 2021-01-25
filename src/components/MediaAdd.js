@@ -9,13 +9,14 @@ import {
     TextField,
     Grid,
     MenuItem,
+    FormControl,
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 const { ipcRenderer } = require('electron');
 
 const useStyles = makeStyles((theme) => ({
     dialogPaper: {
-        height: '60vh',
+        height: '80vh',
     },
 }));
 
@@ -39,12 +40,17 @@ const MediaAdd = ({ open, onClose }) => {
     const [currentSeason, setCurrentSeason] = useState(1);
     const [airingSeason, setAiringSeason] = useState('winter');
     const [airingYear, setAiringYear] = useState(new Date().getFullYear());
+    const [imagePath, setImagePath] = useState('');
     const [mediaPath, setMediaPath] = useState('');
     const [summary, setSummary] = useState('');
     const [tags, setTags] = useState([]);
 
     useEffect(() => {
         //#region ipcRenderer
+        ipcRenderer.on('image:select', (event, paths) => {
+            setImagePath(JSON.parse(paths)[0]);
+        });
+
         ipcRenderer.on('media:select', (event, paths) => {
             setMediaPath(JSON.parse(paths)[0]);
         });
@@ -72,6 +78,10 @@ const MediaAdd = ({ open, onClose }) => {
         setAiringYear(event.target.value);
     };
 
+    const handleImageClick = (event) => {
+        ipcRenderer.send('image:click', type);
+    };
+
     const handleMediaClick = (event) => {
         ipcRenderer.send('media:click', type);
     };
@@ -88,7 +98,8 @@ const MediaAdd = ({ open, onClose }) => {
         onClose();
     };
 
-    const handleSave = () => {
+    const handleSave = (event) => {
+        event.preventDefault();
         const show = {
             title,
             type,
@@ -108,6 +119,10 @@ const MediaAdd = ({ open, onClose }) => {
         });
 
         setTitle('');
+        setCurrentSeason(1);
+        setAiringSeason('winter');
+        setAiringYear(new Date().getFullYear());
+        setImagePath('');
         setMediaPath('');
         setSummary('');
         setTags([]);
@@ -121,152 +136,180 @@ const MediaAdd = ({ open, onClose }) => {
             open={open}
             onClose={handleClose}
             fullWidth
+            maxWidth={'md'}
             classes={{ paper: classes.dialogPaper }}
         >
-            <DialogTitle>Add Media</DialogTitle>
-            <DialogContent>
-                <Grid container spacing={3}>
-                    {type === 'series' ? (
-                        <Grid item xs={9}>
-                            <TextField
-                                autoFocus
-                                fullWidth
-                                value={title}
-                                onChange={handleTitleChange}
-                                placeholder="Series Title..."
-                            />
-                        </Grid>
-                    ) : type === 'episode' ? (
-                        <React.Fragment>
-                            <Grid item xs={7}>
+            <form onSubmit={handleSave}>
+                <DialogTitle>Add Media</DialogTitle>
+
+                <DialogContent style={{ overflowY: 'visible' }}>
+                    <Grid container spacing={3}>
+                        {type === 'series' ? (
+                            <Grid item xs={9}>
+                                <TextField
+                                    required
+                                    autoFocus
+                                    fullWidth
+                                    value={title}
+                                    onChange={handleTitleChange}
+                                    placeholder="Series Title..."
+                                />
+                            </Grid>
+                        ) : type === 'episode' ? (
+                            <React.Fragment>
+                                <Grid item xs={7}>
+                                    <TextField
+                                        autoFocus
+                                        fullWidth
+                                        value={title}
+                                        onChange={handleTitleChange}
+                                        placeholder="Episode Title..."
+                                    />
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <TextField
+                                        type="number"
+                                        fullWidth
+                                        placeholder="#"
+                                    />
+                                </Grid>
+                            </React.Fragment>
+                        ) : (
+                            <Grid item xs={9}>
                                 <TextField
                                     autoFocus
                                     fullWidth
                                     value={title}
                                     onChange={handleTitleChange}
-                                    placeholder="Episode Title..."
+                                    placeholder="Movie Title..."
                                 />
                             </Grid>
-                            <Grid item xs={2}>
-                                <TextField
-                                    type="number"
-                                    fullWidth
-                                    placeholder="#"
-                                />
-                            </Grid>
-                        </React.Fragment>
-                    ) : (
-                        <Grid item xs={9}>
+                        )}
+                        <Grid item xs={3}>
                             <TextField
-                                autoFocus
+                                select
                                 fullWidth
-                                value={title}
-                                onChange={handleTitleChange}
-                                placeholder="Movie Title..."
+                                value={type}
+                                onChange={handleTypeChange}
+                                helperText="Type of Media"
+                            >
+                                {types.map((type) => (
+                                    <MenuItem
+                                        key={type.value}
+                                        value={type.value}
+                                    >
+                                        {type.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                required
+                                type="number"
+                                fullWidth
+                                value={currentSeason}
+                                onChange={handleCurrentSeasonChange}
+                                helperText="Current Season"
+                            ></TextField>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                select
+                                fullWidth
+                                value={airingSeason}
+                                onChange={handleAiringSeasonChange}
+                                helperText="Airing Season"
+                            >
+                                {seasons.map((season) => (
+                                    <MenuItem
+                                        key={season.value}
+                                        value={season.value}
+                                    >
+                                        {season.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                required
+                                type="number"
+                                fullWidth
+                                value={airingYear}
+                                onChange={handleAiringYearChange}
+                                helperText="Airing Year"
+                            ></TextField>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={handleImageClick}
+                            >
+                                Choose image for series
+                            </Button>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <TextField
+                                name="imagePath"
+                                fullWidth
+                                placeholder="Path to image..."
+                                disabled
+                                value={imagePath}
                             />
                         </Grid>
-                    )}
-                    <Grid item xs={3}>
-                        <TextField
-                            select
-                            fullWidth
-                            value={type}
-                            onChange={handleTypeChange}
-                            helperText="Type of Media"
-                        >
-                            {types.map((type) => (
-                                <MenuItem key={type.value} value={type.value}>
-                                    {type.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        <Grid item xs={4}>
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={handleMediaClick}
+                            >
+                                Choose media
+                            </Button>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <TextField
+                                name="mediaPath"
+                                fullWidth
+                                placeholder="Path to media..."
+                                disabled
+                                value={mediaPath}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                multiline
+                                fullWidth
+                                rows={4}
+                                value={summary}
+                                onChange={handleSummaryChange}
+                                helperText="Summary"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Autocomplete
+                                multiple
+                                options={tags}
+                                fullWidth
+                                freeSolo
+                                onChange={handleTagDone}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        helperText="Tags"
+                                        variant="standard"
+                                    />
+                                )}
+                            />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={4}>
-                        <TextField
-                            type="number"
-                            fullWidth
-                            value={currentSeason}
-                            onChange={handleCurrentSeasonChange}
-                            helperText="Current Season"
-                        ></TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <TextField
-                            select
-                            fullWidth
-                            value={airingSeason}
-                            onChange={handleAiringSeasonChange}
-                            helperText="Airing Season"
-                        >
-                            {seasons.map((season) => (
-                                <MenuItem
-                                    key={season.value}
-                                    value={season.value}
-                                >
-                                    {season.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <TextField
-                            type="number"
-                            fullWidth
-                            value={airingYear}
-                            onChange={handleAiringYearChange}
-                            helperText="Airing Year"
-                        ></TextField>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Button
-                            variant="outlined"
-                            size="large"
-                            onClick={handleMediaClick}
-                        >
-                            Choose media
-                        </Button>
-                    </Grid>
-                    <Grid item xs={8}>
-                        <TextField
-                            name="mediaPath"
-                            fullWidth
-                            placeholder="Path to media..."
-                            disabled
-                            value={mediaPath}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            multiline
-                            fullWidth
-                            rows={4}
-                            value={summary}
-                            onChange={handleSummaryChange}
-                            helperText="Summary"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Autocomplete
-                            multiple
-                            options={tags}
-                            fullWidth
-                            freeSolo
-                            onChange={handleTagDone}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    helperText="Tags"
-                                    variant="standard"
-                                />
-                            )}
-                        />
-                    </Grid>
-                </Grid>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button onClick={handleSave}>Add</Button>
-            </DialogActions>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Close</Button>
+                    <Button type="submit">Add</Button>
+                </DialogActions>
+            </form>
         </Dialog>
     );
 };

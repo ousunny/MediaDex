@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
+            favorite: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
             image_location: {
                 type: DataTypes.STRING,
             },
