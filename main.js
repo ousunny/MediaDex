@@ -113,12 +113,23 @@ ipcMain.on('series:add', async (e, show) => {
             airing_season: show.airing_season,
             airing_year: show.airing_year,
         }).then(async (series) => {
+            const episodes = show.episodes.map((episode) => {
+                return {
+                    number: episode.episodeNumber,
+                    series_id: series.id,
+                    location: episode.filePath,
+                };
+            });
+            await models.Episodes.bulkCreate(episodes);
+
             await models.SeriesAccesses.create({
                 series_id: series.id,
             });
             await models.SeriesSeasons.create({
                 series_id: series.id,
                 summary: show.summary,
+                directory_location: show.directory_location,
+                image_location: show.image_location,
                 current_season: show.current_season,
             });
 

@@ -10,9 +10,12 @@ import {
     Grid,
     MenuItem,
     FormControl,
+    Typography,
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 const { ipcRenderer } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
 const useStyles = makeStyles((theme) => ({
     dialogPaper: {
@@ -44,6 +47,14 @@ const MediaAdd = ({ open, onClose }) => {
     const [mediaPath, setMediaPath] = useState('');
     const [summary, setSummary] = useState('');
     const [tags, setTags] = useState([]);
+    const [episodes, setEpisodes] = useState([
+        {
+            index: 0,
+            filePath: '',
+            filename: '',
+            episodeNumber: 0,
+        },
+    ]);
 
     useEffect(() => {
         //#region ipcRenderer
@@ -52,7 +63,25 @@ const MediaAdd = ({ open, onClose }) => {
         });
 
         ipcRenderer.on('media:select', (event, paths) => {
-            setMediaPath(JSON.parse(paths)[0]);
+            const directoryPath = JSON.parse(paths)[0];
+            setMediaPath(directoryPath);
+
+            fs.readdir(directoryPath, (err, filenames) => {
+                setEpisodes(
+                    filenames.map((filename, index) => {
+                        const episodeNumber = parseInt(
+                            filename.split(' - ')[1].match(/[0-9]+/)[0]
+                        );
+
+                        return {
+                            index,
+                            filePath: path.join(directoryPath, filename),
+                            filename: filename,
+                            episodeNumber,
+                        };
+                    })
+                );
+            });
         });
         //#endregion
     }, []);
@@ -94,12 +123,26 @@ const MediaAdd = ({ open, onClose }) => {
         setTags(options);
     };
 
+    const handleEpisodeChange = (event, index) => {
+        const currentEpisodes = [...episodes];
+
+        const episodeIndex = currentEpisodes.findIndex(
+            (currentEpisode) => currentEpisode.index === index
+        );
+        currentEpisodes[episodeIndex] = {
+            ...currentEpisodes[episodeIndex],
+            episodeNumber: event.target.value,
+        };
+        setEpisodes(currentEpisodes);
+    };
+
     const handleClose = () => {
         onClose();
     };
 
     const handleSave = (event) => {
         event.preventDefault();
+
         const show = {
             title,
             type,
@@ -109,10 +152,13 @@ const MediaAdd = ({ open, onClose }) => {
             mediaPath,
             summary,
             tags,
+            episodes,
         };
 
         ipcRenderer.send('series:add', {
             ...show,
+            directory_location: mediaPath,
+            image_location: imagePath,
             current_season: currentSeason,
             airing_season: airingSeason,
             airing_year: airingYear,
@@ -126,6 +172,9 @@ const MediaAdd = ({ open, onClose }) => {
         setMediaPath('');
         setSummary('');
         setTags([]);
+        setEpisodes([
+            { index: 0, filePath: '', filename: '', episodeNumber: 0 },
+        ]);
 
         onClose();
     };
@@ -245,6 +294,7 @@ const MediaAdd = ({ open, onClose }) => {
                         </Grid>
                         <Grid item xs={4}>
                             <Button
+                                fullWidth
                                 variant="outlined"
                                 size="large"
                                 onClick={handleImageClick}
@@ -263,6 +313,7 @@ const MediaAdd = ({ open, onClose }) => {
                         </Grid>
                         <Grid item xs={4}>
                             <Button
+                                fullWidth
                                 variant="outlined"
                                 size="large"
                                 onClick={handleMediaClick}
@@ -304,6 +355,42 @@ const MediaAdd = ({ open, onClose }) => {
                                     />
                                 )}
                             />
+                        </Grid>
+
+                        <Grid container item spacing={3}>
+                            <Grid item>
+                                <Typography variant="h6">Episodes</Typography>
+                            </Grid>
+
+                            {episodes.map((episode, index) => (
+                                <Grid
+                                    container
+                                    item
+                                    xs={12}
+                                    key={index}
+                                    spacing={1}
+                                >
+                                    <Grid item xs={11}>
+                                        <TextField
+                                            disabled
+                                            fullWidth
+                                            value={episode.filename}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={1}>
+                                        <TextField
+                                            fullWidth
+                                            value={episode.episodeNumber}
+                                            onChange={(event) =>
+                                                handleEpisodeChange(
+                                                    event,
+                                                    index
+                                                )
+                                            }
+                                        />
+                                    </Grid>
+                                </Grid>
+                            ))}
                         </Grid>
                     </Grid>
                 </DialogContent>

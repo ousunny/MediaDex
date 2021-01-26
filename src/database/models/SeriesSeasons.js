@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+            directory_location: {
+                type: DataTypes.STRING,
+            },
             image_location: {
                 type: DataTypes.STRING,
             },
