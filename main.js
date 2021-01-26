@@ -43,8 +43,18 @@ const models = {
 models.Series.hasOne(models.SeriesAccesses, { foreignKey: 'series_id' });
 models.Series.hasMany(models.Episodes, { foreignKey: 'series_id' });
 models.Series.hasMany(models.SeriesSeasons, { foreignKey: 'series_id' });
-models.Series.belongsToMany(models.Tags, { through: models.SeriesTags });
-models.Tags.belongsToMany(models.Series, { through: models.SeriesTags });
+models.Series.belongsToMany(models.Tags, {
+    through: models.SeriesTags,
+    foreignKey: 'series_id',
+});
+models.Tags.belongsToMany(models.Series, {
+    through: models.SeriesTags,
+    foreignKey: 'tag_id',
+});
+models.Series.hasMany(models.SeriesTags);
+models.SeriesTags.belongsTo(models.Series);
+models.Tags.hasMany(models.SeriesTags);
+models.SeriesTags.belongsTo(models.Tags);
 //#endregion
 
 //#region MainWindow
@@ -101,7 +111,7 @@ async function createMainWindow() {
 ipcMain.on('series:load', (e, nav) => {
     switch (nav) {
         case 0:
-            sendLatestSeries(4);
+            sendAllSeries();
             break;
     }
 });
@@ -156,7 +166,7 @@ ipcMain.on('series:add', async (e, show) => {
             }
         });
 
-        sendLatestSeries(4);
+        sendAllSeries();
     } catch (err) {
         console.log(err);
     }
@@ -193,8 +203,15 @@ ipcMain.on('media:click', async (event, arg) => {
 
 async function sendAllSeries() {
     try {
-        const series = await models.Series.findAll();
-        console.log(series);
+        const series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                models.SeriesTags,
+            ],
+        });
+
         mainWindow.webContents.send('series:get', JSON.stringify(series));
     } catch (err) {
         console.log(err);
