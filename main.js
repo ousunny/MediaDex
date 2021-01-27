@@ -2,7 +2,7 @@ const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
-const { ipcMain, dialog, protocol } = require('electron');
+const { ipcMain, dialog, protocol, shell } = require('electron');
 const Series = require('./src/database/models/Series');
 
 const sequelize = new Sequelize({
@@ -198,6 +198,10 @@ ipcMain.on('media:click', async (event, arg) => {
         'media:select',
         JSON.stringify(result.filePaths)
     );
+});
+
+ipcMain.on('episode:play', async (event, filePath) => {
+    shell.openExternal(path.join('file://', filePath));
 });
 
 //#endregion

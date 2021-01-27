@@ -85,14 +85,16 @@ const App = () => {
     const [nav, setNav] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
     const [detailView, setDetailView] = useState(false);
+    const [detailShow, setDetailShow] = useState(null);
 
     useEffect(() => {
         ipcRenderer.send('series:load', nav);
 
         ipcRenderer.on('series:get', (e, series) => {
             setSeries(JSON.parse(series));
-            console.log(series);
+            console.log(JSON.parse(series)[0]);
         });
+
         ipcRenderer.on('series:get_latest', (e, series) => {
             setSeriesLatest(JSON.parse(series));
             console.log(series);
@@ -109,8 +111,9 @@ const App = () => {
         addOpen ? setAddOpen(false) : setAddOpen(true);
     };
 
-    function displayDetailView(display) {
+    function displayDetailView(display, show) {
         setDetailView(true);
+        setDetailShow(show);
     }
 
     return (
@@ -172,7 +175,7 @@ const App = () => {
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <SeriesDetailView />
+                        <SeriesDetailView show={detailShow} />
                     </Fragment>
                 )}
             </main>
