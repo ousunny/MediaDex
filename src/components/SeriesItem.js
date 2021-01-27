@@ -7,22 +7,30 @@ import {
     CardMedia,
     CardContent,
 } from '@material-ui/core';
+const path = require('path');
 
 const useStyles = makeStyles((theme) => ({}));
 
-const SeriesItem = ({ displayDetailView, show: { id, title } }) => {
+const SeriesItem = ({ displayDetailView, show }) => {
     const classes = useStyles();
 
     const handleCardClick = (event) => {
-        displayDetailView(true);
+        displayDetailView(true, show);
     };
 
     return (
         <Card style={{ height: '100%' }}>
             <CardActionArea onClick={handleCardClick}>
-                <CardMedia component="img" height="200" />
+                <CardMedia
+                    component="img"
+                    image={path.join(
+                        'file://',
+                        show.series_seasons[0].image_location
+                    )}
+                    height="250"
+                />
                 <CardContent>
-                    <Typography variant="h5">{title}</Typography>
+                    <Typography variant="subtitle1">{`${show.title} - S${show.series_seasons[0].current_season}`}</Typography>
                 </CardContent>
             </CardActionArea>
         </Card>
