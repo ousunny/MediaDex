@@ -2,7 +2,7 @@ const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
-const { ipcMain, dialog } = require('electron');
+const { ipcMain, dialog, protocol } = require('electron');
 const Series = require('./src/database/models/Series');
 
 const sequelize = new Sequelize({
@@ -76,6 +76,7 @@ async function createMainWindow() {
         opacity: 0.98,
         webPreferences: {
             nodeIntegration: true,
+            webSecurity: false,
         },
     });
 
@@ -208,7 +209,10 @@ async function sendAllSeries() {
                 models.Episodes,
                 models.SeriesAccesses,
                 models.SeriesSeasons,
-                models.SeriesTags,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                },
             ],
         });
 
@@ -242,6 +246,13 @@ async function sendLatestSeries(amount) {
 
 app.on('ready', () => {
     createMainWindow();
+});
+
+app.whenReady().then(() => {
+    protocol.registerFileProtocol('file', (request, callback) => {
+        const pathname = decodeURI(request.url.replace('file:///', ''));
+        callback(pathname);
+    });
 });
 
 app.on('activate', () => {
