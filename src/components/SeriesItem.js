@@ -19,7 +19,7 @@ const SeriesItem = ({ displayDetailView, show }) => {
     };
 
     return (
-        <Card style={{ height: '100%' }}>
+        <Card style={{ height: '100%', maxWidth: '250px' }}>
             <CardActionArea onClick={handleCardClick}>
                 <CardMedia
                     component="img"
@@ -30,7 +30,10 @@ const SeriesItem = ({ displayDetailView, show }) => {
                     height="250"
                 />
                 <CardContent>
-                    <Typography variant="subtitle1">{`${show.title} - S${show.series_seasons[0].current_season}`}</Typography>
+                    <Typography
+                        noWrap
+                        variant="subtitle1"
+                    >{`${show.title} - S${show.series_seasons[0].current_season}`}</Typography>
                 </CardContent>
             </CardActionArea>
         </Card>

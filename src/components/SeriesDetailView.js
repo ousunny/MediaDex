@@ -10,6 +10,7 @@ import {
     ListItem,
     ListItemText,
 } from '@material-ui/core';
+import { Delete, Edit } from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
 const path = require('path');
 
@@ -31,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
     },
     episodes: {
         width: '100%',
+    },
+    icon: {
+        marginTop: '0.5rem',
     },
 }));
 
@@ -63,7 +67,36 @@ const SeriesDetailView = ({ show }) => {
                         spacing={3}
                     >
                         <Grid container item direction="column">
-                            <Typography variant="h3">{show.title}</Typography>
+                            <Grid
+                                container
+                                item
+                                justify="space-between"
+                                alignItems="flex-start"
+                            >
+                                <Grid
+                                    container
+                                    item
+                                    xs={11}
+                                    wrap="nowrap"
+                                    alignItems="flex-start"
+                                >
+                                    <Typography variant="h3">
+                                        {show.title}
+                                    </Typography>
+                                    <Button
+                                        style={{ marginLeft: '0.5rem' }}
+                                        className={classes.icon}
+                                    >
+                                        <Edit />
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={1}>
+                                    <Button className={classes.icon}>
+                                        <Delete color="error" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+
                             <Typography variant="h6">{`Season ${show.series_seasons[0].current_season}`}</Typography>
                             <Grid container item className={classes.tags}>
                                 {show.series_tags.map((series_tag) => (
