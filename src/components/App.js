@@ -11,16 +11,33 @@ import {
     Drawer,
     List,
     ListItem,
+    ListItemIcon,
     ListItemText,
 } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
+import {
+    Add,
+    Home as HomeIcon,
+    Bookmark,
+    VideoLibrary,
+    ArrowBack,
+} from '@material-ui/icons';
 import SearchBar from './SearchBar';
 import Home from './Home';
 import Bookmarks from './Bookmarks';
 import Browse from './Browse';
 import MediaAdd from './MediaAdd';
 import SeriesDetailView from './SeriesDetailView';
+import clsx from 'clsx';
 import { ipcRenderer } from 'electron';
+
+const navigationItems = [
+    {
+        label: 'Home',
+        icon: <HomeIcon fontSize="large" />,
+    },
+    { label: 'Bookmarks', icon: <Bookmark fontSize="large" /> },
+    { label: 'Browse', icon: <VideoLibrary fontSize="large" /> },
+];
 
 const darkTheme = createMuiTheme({
     palette: {
@@ -29,6 +46,7 @@ const darkTheme = createMuiTheme({
 });
 
 const drawerWidth = '240px';
+const drawerShrinkWidth = '100px';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -41,18 +59,41 @@ const useStyles = makeStyles((theme) => ({
     drawerPaper: {
         width: drawerWidth,
     },
+    drawerExpand: {
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+    drawerShrink: {
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        overflowX: 'hidden',
+        width: drawerShrinkWidth,
+    },
     logo: {
         fontSize: '3rem',
         margin: '1rem',
     },
     nav: {
         margin: 'auto',
-        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
     },
-    navItems: {
-        padding: '0 1rem',
-        fontSize: '2rem',
+    navText: {
+        fontSize: '1.8rem',
         textAlign: 'right',
+    },
+    navIcon: {
+        padding: '0.5rem',
+    },
+    navIconShrink: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     content: {
         padding: theme.spacing(3),
@@ -75,6 +116,10 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         position: 'absolute',
         right: 0,
+    },
+    back: {
+        padding: '1rem',
+        height: '100%',
     },
 }));
 
@@ -101,6 +146,10 @@ const App = () => {
         });
     }, []);
 
+    const handleBackClick = () => {
+        setDetailView(false);
+    };
+
     const handleNavClick = (index) => {
         setDetailView(false);
         ipcRenderer.send('series:load', index);
@@ -120,27 +169,53 @@ const App = () => {
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
             <Drawer
-                className={classes.drawer}
+                className={clsx(classes.drawer, {
+                    [classes.drawerExpand]: !detailView,
+                    [classes.drawerShrink]: detailView,
+                })}
                 variant="permanent"
                 anchor="left"
-                classes={{ paper: classes.drawerPaper }}
+                classes={{
+                    paper: clsx(classes.drawerPaper, {
+                        [classes.drawerExpand]: !detailView,
+                        [classes.drawerShrink]: detailView,
+                    }),
+                }}
             >
                 <Typography className={classes.logo} variant="h1">
-                    MediaDex
+                    {!detailView ? (
+                        'MediaDex'
+                    ) : (
+                        <Button
+                            className={classes.back}
+                            onClick={handleBackClick}
+                        >
+                            <ArrowBack fontSize="large" />
+                        </Button>
+                    )}
                 </Typography>
                 <List className={classes.nav}>
-                    {['Home', 'Bookmarks', 'Browse'].map((text, index) => (
+                    {navigationItems.map((navigationItem, index) => (
                         <ListItem
                             button
-                            key={text}
+                            key={navigationItem.label}
                             value={index}
                             selected={index === nav ? true : false}
                             onClick={() => handleNavClick(index)}
                         >
-                            <ListItemText
-                                classes={{ primary: classes.navItems }}
-                                primary={text}
-                            />
+                            {!detailView && (
+                                <ListItemText
+                                    classes={{ primary: classes.navText }}
+                                    primary={navigationItem.label}
+                                />
+                            )}
+                            <ListItemIcon
+                                className={clsx(classes.navIcon, {
+                                    [classes.navIconShrink]: detailView,
+                                })}
+                            >
+                                {navigationItem.icon}
+                            </ListItemIcon>
                         </ListItem>
                     ))}
                 </List>
@@ -175,7 +250,11 @@ const App = () => {
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <SeriesDetailView show={detailShow} />
+                        <SeriesDetailView
+                            nav={nav}
+                            handleNavClick={handleNavClick}
+                            show={detailShow}
+                        />
                     </Fragment>
                 )}
             </main>
