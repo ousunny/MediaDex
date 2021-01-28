@@ -62,7 +62,7 @@ async function createMainWindow() {
     try {
         await sequelize.authenticate();
         await sequelize.query('PRAGMA foreign_keys=false;');
-        await sequelize.sync({ force: true });
+        await sequelize.sync();
         await sequelize.query('PRAGMA foreign_keys=true;');
     } catch (err) {
         console.error('Cannot connect to db');
