@@ -160,9 +160,9 @@ const App = () => {
         addOpen ? setAddOpen(false) : setAddOpen(true);
     };
 
-    function displayDetailView(display, show) {
-        setDetailView(true);
-        setDetailShow(show);
+    function displayDetailView(display, show = null) {
+        setDetailView(display);
+        if (display && show) setDetailShow(show);
     }
 
     return (
@@ -251,8 +251,7 @@ const App = () => {
                 ) : (
                     <Fragment>
                         <SeriesDetailView
-                            nav={nav}
-                            handleNavClick={handleNavClick}
+                            displayDetailView={displayDetailView}
                             show={detailShow}
                         />
                     </Fragment>

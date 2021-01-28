@@ -200,6 +200,11 @@ ipcMain.on('media:click', async (event, arg) => {
     );
 });
 
+ipcMain.on('media:delete', async (event, id) => {
+    models.Series.destroy({ where: { id } });
+    sendAllSeries();
+});
+
 ipcMain.on('episode:play', async (event, filePath) => {
     shell.openExternal(path.join('file://', filePath));
 });

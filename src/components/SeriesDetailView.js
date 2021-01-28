@@ -38,8 +38,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SeriesDetailView = ({ show }) => {
+const SeriesDetailView = ({ displayDetailView, show }) => {
     const classes = useStyles();
+
+    const handleDeleteClick = () => {
+        ipcRenderer.send('media:delete', show.id);
+        displayDetailView(false);
+    };
 
     const handleEpisodeClick = (filePath) => {
         ipcRenderer.send('episode:play', filePath);
@@ -91,7 +96,10 @@ const SeriesDetailView = ({ show }) => {
                                     </Button>
                                 </Grid>
                                 <Grid item xs={1}>
-                                    <Button className={classes.icon}>
+                                    <Button
+                                        className={classes.icon}
+                                        onClick={handleDeleteClick}
+                                    >
                                         <Delete color="error" />
                                     </Button>
                                 </Grid>
