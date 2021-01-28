@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Button,
@@ -13,6 +13,7 @@ import {
 import { Delete, Edit } from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
 const path = require('path');
+import MediaEdit from './MediaEdit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -38,16 +39,21 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SeriesDetailView = ({ displayDetailView, show }) => {
+const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
     const classes = useStyles();
+    const [editOpen, setEditOpen] = useState(false);
 
     const handleDeleteClick = () => {
         ipcRenderer.send('media:delete', show.id);
-        displayDetailView(false);
+        displayDetailView(false, null);
     };
 
     const handleEpisodeClick = (filePath) => {
         ipcRenderer.send('episode:play', filePath);
+    };
+
+    const handleEditClick = () => {
+        editOpen ? setEditOpen(false) : setEditOpen(true);
     };
 
     return (
@@ -91,6 +97,7 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
                                     <Button
                                         style={{ marginLeft: '0.5rem' }}
                                         className={classes.icon}
+                                        onClick={handleEditClick}
                                     >
                                         <Edit />
                                     </Button>
@@ -148,6 +155,13 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
                     </List>
                 </Grid>
             </Grid>
+
+            <MediaEdit
+                open={editOpen}
+                onClose={handleEditClick}
+                seriesUpdated={seriesUpdated}
+                show={show}
+            />
         </Fragment>
     );
 };

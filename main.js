@@ -173,6 +173,55 @@ ipcMain.on('series:add', async (e, show) => {
     }
 });
 
+ipcMain.on('series:edit', async (event, show) => {
+    try {
+        await models.Series.update(
+            {
+                title: show.title,
+                airing_season: show.airing_season,
+                airing_year: show.airing_year,
+            },
+            { where: { id: show.id } }
+        ).then(async () => {
+            await models.SeriesSeasons.update(
+                {
+                    summary: show.summary,
+                    directory_location: show.directory_location,
+                    image_location: show.image_location,
+                    current_season: show.current_season,
+                },
+                { where: { series_id: show.id } }
+            );
+
+            // if (show.tags.length > 0) {
+            //     const tags = show.tags.map((tag) => ({ tag_name: tag }));
+            //     await models.Tags.bulkCreate(tags, {
+            //         fields: ['tag_name'],
+            //         updateOnDuplicate: ['tag_name'],
+            //     }).then(async () => {
+            //         const foundTags = await models.Tags.findAll({
+            //             where: { tag_name: show.tags },
+            //             attributes: ['id'],
+            //         });
+
+            //         const tagIds = foundTags.map((foundTag) => ({
+            //             series_id: show.id,
+            //             tag_id: foundTag.id,
+            //         }));
+
+            //         await models.SeriesTags.bulkCreate(tagIds, {
+            //             updateOnDuplicate: ['tag_id'],
+            //         });
+            //     });
+            // }
+        });
+
+        sendAllSeries();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('image:click', async (event, arg) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],

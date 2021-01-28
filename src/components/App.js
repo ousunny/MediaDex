@@ -131,20 +131,32 @@ const App = () => {
     const [addOpen, setAddOpen] = useState(false);
     const [detailView, setDetailView] = useState(false);
     const [detailShow, setDetailShow] = useState(null);
+    const [currentShowId, setCurrentShowId] = useState(-1);
+    const loaded = React.useRef(false);
 
     useEffect(() => {
-        ipcRenderer.send('series:load', nav);
+        if (!loaded.current) {
+            ipcRenderer.send('series:load', nav);
 
-        ipcRenderer.on('series:get', (e, series) => {
-            setSeries(JSON.parse(series));
-            console.log(JSON.parse(series)[0]);
-        });
+            ipcRenderer.on('series:get', (e, loadedShows) => {
+                setSeries(JSON.parse(loadedShows));
+            });
 
-        ipcRenderer.on('series:get_latest', (e, series) => {
-            setSeriesLatest(JSON.parse(series));
-            console.log(series);
-        });
-    }, []);
+            ipcRenderer.on('series:get_latest', (e, series) => {
+                setSeriesLatest(JSON.parse(series));
+                console.log(series);
+            });
+
+            loaded.current = true;
+        }
+
+        if (detailView) {
+            const currentShowIndex = series.findIndex(
+                (show) => show.id === currentShowId
+            );
+            currentShowIndex >= 0 && setDetailShow(series[currentShowIndex]);
+        }
+    }, [series]);
 
     const handleBackClick = () => {
         setDetailView(false);
@@ -160,9 +172,15 @@ const App = () => {
         addOpen ? setAddOpen(false) : setAddOpen(true);
     };
 
-    function displayDetailView(display, show = null) {
+    function displayDetailView(display, show) {
         setDetailView(display);
-        if (display && show) setDetailShow(show);
+        setDetailShow(show);
+    }
+
+    function seriesUpdated(id) {
+        setCurrentShowId(id);
+        // const currentShowIndex = series.findIndex((show) => show.id === id);
+        // currentShowIndex >= 0 && setDetailShow(series[currentShowIndex]);
     }
 
     return (
@@ -252,6 +270,7 @@ const App = () => {
                     <Fragment>
                         <SeriesDetailView
                             displayDetailView={displayDetailView}
+                            seriesUpdated={seriesUpdated}
                             show={detailShow}
                         />
                     </Fragment>
