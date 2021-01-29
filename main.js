@@ -251,28 +251,6 @@ ipcMain.on('series:edit', async (event, show) => {
                     },
                 });
             });
-
-            // if (show.tags.length > 0) {
-            //     const tags = show.tags.map((tag) => ({ tag_name: tag }));
-            //     await models.Tags.bulkCreate(tags, {
-            //         fields: ['tag_name'],
-            //         updateOnDuplicate: ['tag_name'],
-            //     }).then(async () => {
-            //         const foundTags = await models.Tags.findAll({
-            //             where: { tag_name: show.tags },
-            //             attributes: ['id'],
-            //         });
-
-            //         const tagIds = foundTags.map((foundTag) => ({
-            //             series_id: show.id,
-            //             tag_id: foundTag.id,
-            //         }));
-
-            //         await models.SeriesTags.bulkCreate(tagIds, {
-            //             updateOnDuplicate: ['tag_id'],
-            //         });
-            //     });
-            // }
         });
 
         sendAllSeries();
