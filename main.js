@@ -51,9 +51,15 @@ models.Tags.belongsToMany(models.Series, {
     through: models.SeriesTags,
     foreignKey: 'tag_id',
 });
-models.Series.hasMany(models.SeriesTags);
+models.Series.hasMany(models.SeriesTags, {
+    foreignKey: { allowNull: false },
+    onDelete: 'CASCADE',
+});
 models.SeriesTags.belongsTo(models.Series);
-models.Tags.hasMany(models.SeriesTags);
+models.Tags.hasMany(models.SeriesTags, {
+    foreignKey: { allowNull: false },
+    onDelete: 'CASCADE',
+});
 models.SeriesTags.belongsTo(models.Tags);
 //#endregion
 
@@ -192,6 +198,59 @@ ipcMain.on('series:edit', async (event, show) => {
                 },
                 { where: { series_id: show.id } }
             );
+
+            const allTags = await models.SeriesTags.findAll({
+                where: { series_id: show.id },
+                include: [{ model: models.Tags, attributes: ['tag_name'] }],
+                raw: true,
+                attributes: ['tag_id'],
+            });
+            let remainingTags = show.tags;
+
+            const tagsToDelete = allTags.reduce((result, singleTag) => {
+                const tagsIndex = remainingTags.indexOf(
+                    singleTag['tag.tag_name']
+                );
+                tagsIndex >= 0
+                    ? remainingTags.splice(tagsIndex, 1)
+                    : result.push(singleTag);
+
+                return result;
+            }, []);
+
+            console.log(tagsToDelete);
+            console.log(remainingTags);
+
+            const remainingTagsObj = remainingTags.map((tag) => ({
+                tag_name: tag,
+            }));
+
+            await models.Tags.bulkCreate(remainingTagsObj, {
+                fields: ['tag_name'],
+                updateOnDuplicate: ['tag_name'],
+            }).then(async () => {
+                const foundTags = await models.Tags.findAll({
+                    where: { tag_name: remainingTags },
+                    attributes: ['id'],
+                });
+
+                const remainingTagsWithIds = foundTags.map((foundTag) => ({
+                    series_id: show.id,
+                    tag_id: foundTag.id,
+                }));
+
+                await models.SeriesTags.bulkCreate(remainingTagsWithIds, {
+                    updateOnDuplicate: ['tag_id'],
+                });
+            });
+
+            tagsToDelete.map((tagToDelete) => {
+                models.SeriesTags.destroy({
+                    where: {
+                        tag_id: tagToDelete.tag_id,
+                    },
+                });
+            });
 
             // if (show.tags.length > 0) {
             //     const tags = show.tags.map((tag) => ({ tag_name: tag }));

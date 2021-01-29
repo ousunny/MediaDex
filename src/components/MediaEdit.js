@@ -35,8 +35,6 @@ const seasons = [
     { value: 'fall', label: 'Fall' },
 ];
 
-let defaultTags;
-
 const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
     const classes = useStyles();
     const [title, setTitle] = useState(show.title);
@@ -56,36 +54,39 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
     const [tags, setTags] = useState(
         show.series_tags.map((series_tag) => series_tag.tag.tag_name)
     );
+    const loaded = React.useRef(false);
 
     useEffect(() => {
-        defaultTags = tags;
-        //#region ipcRenderer
-        ipcRenderer.on('image:select', (event, paths) => {
-            setImagePath(JSON.parse(paths)[0]);
-        });
-
-        ipcRenderer.on('media:select', (event, paths) => {
-            const directoryPath = JSON.parse(paths)[0];
-            setMediaPath(directoryPath);
-
-            fs.readdir(directoryPath, (err, filenames) => {
-                setEpisodes(
-                    filenames.map((filename, index) => {
-                        const episodeNumber = parseInt(
-                            filename.split(' - ')[1].match(/[0-9]+/)[0]
-                        );
-
-                        return {
-                            index,
-                            filePath: path.join(directoryPath, filename),
-                            filename: filename,
-                            episodeNumber,
-                        };
-                    })
-                );
+        if (!loaded.current) {
+            //#region ipcRenderer
+            ipcRenderer.on('image:select', (event, paths) => {
+                setImagePath(JSON.parse(paths)[0]);
             });
-        });
-        //#endregion
+
+            ipcRenderer.on('media:select', (event, paths) => {
+                const directoryPath = JSON.parse(paths)[0];
+                setMediaPath(directoryPath);
+
+                fs.readdir(directoryPath, (err, filenames) => {
+                    setEpisodes(
+                        filenames.map((filename, index) => {
+                            const episodeNumber = parseInt(
+                                filename.split(' - ')[1].match(/[0-9]+/)[0]
+                            );
+
+                            return {
+                                index,
+                                filePath: path.join(directoryPath, filename),
+                                filename: filename,
+                                episodeNumber,
+                            };
+                        })
+                    );
+                });
+            });
+            //#endregion
+            loaded.current = true;
+        }
     }, []);
 
     //#region Events
@@ -318,7 +319,7 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
                                 options={tags}
                                 fullWidth
                                 freeSolo
-                                defaultValue={defaultTags}
+                                value={tags}
                                 onChange={handleTagDone}
                                 renderInput={(params) => (
                                     <TextField

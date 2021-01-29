@@ -6,11 +6,13 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 primaryKey: true,
+                onDelete: 'CASCADE',
             },
             tag_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 primaryKey: true,
+                onDelete: 'CASCADE',
             },
         },
         { underscored: true, timestamps: false }
