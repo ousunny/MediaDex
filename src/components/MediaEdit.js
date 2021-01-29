@@ -63,27 +63,6 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
                 setImagePath(JSON.parse(paths)[0]);
             });
 
-            ipcRenderer.on('media:select', (event, paths) => {
-                const directoryPath = JSON.parse(paths)[0];
-                setMediaPath(directoryPath);
-
-                fs.readdir(directoryPath, (err, filenames) => {
-                    setEpisodes(
-                        filenames.map((filename, index) => {
-                            const episodeNumber = parseInt(
-                                filename.split(' - ')[1].match(/[0-9]+/)[0]
-                            );
-
-                            return {
-                                index,
-                                filePath: path.join(directoryPath, filename),
-                                filename: filename,
-                                episodeNumber,
-                            };
-                        })
-                    );
-                });
-            });
             //#endregion
             loaded.current = true;
         }
@@ -137,7 +116,7 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
             id: show.id,
             title,
             type,
-            directory_location: mediaPath,
+
             image_location: imagePath,
             current_season: currentSeason,
             airing_season: airingSeason,
@@ -282,25 +261,6 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
                                 placeholder="Path to image..."
                                 disabled
                                 value={imagePath}
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                size="large"
-                                onClick={handleMediaClick}
-                            >
-                                Choose media
-                            </Button>
-                        </Grid>
-                        <Grid item xs={8}>
-                            <TextField
-                                name="mediaPath"
-                                fullWidth
-                                placeholder="Path to media..."
-                                disabled
-                                value={mediaPath}
                             />
                         </Grid>
                         <Grid item xs={12}>
