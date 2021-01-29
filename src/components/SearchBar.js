@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { OutlinedInput } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
+import { ipcRenderer } from 'electron';
 
 const useStyles = makeStyles((theme) => ({
     search: {
@@ -25,6 +26,13 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchBar = () => {
     const classes = useStyles();
+    const [searchTerm, setSearchTerm] = React.useState('');
+
+    const handleSearchChange = (event) => {
+        // console.log(event.target.value);
+        setSearchTerm(event.target.value);
+        ipcRenderer.send('series:search', event.target.value);
+    };
 
     return (
         <div className={classes.search}>
@@ -32,6 +40,8 @@ const SearchBar = () => {
                 placeholder="Search..."
                 variant="outlined"
                 fullWidth
+                value={searchTerm}
+                onChange={handleSearchChange}
                 classes={{
                     root: classes.inputRoot,
                     input: classes.inputInput,

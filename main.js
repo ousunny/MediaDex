@@ -259,6 +259,43 @@ ipcMain.on('series:edit', async (event, show) => {
     }
 });
 
+ipcMain.on('series:search', async (event, term) => {
+    if (term === '') {
+        sendAllSeries();
+        return;
+    }
+
+    try {
+        const series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                    required: false,
+                },
+            ],
+            required: false,
+            where: {
+                [Op.or]: [
+                    {
+                        '$series_tags.tag.tag_name$': {
+                            [Op.like]: `%${term}%`,
+                        },
+                    },
+                    { '$series.title$': { [Op.like]: `%${term}%` } },
+                ],
+            },
+        });
+
+        mainWindow.webContents.send('series:get', JSON.stringify(series));
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('image:click', async (event, arg) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
