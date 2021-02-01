@@ -3,16 +3,22 @@ import { Typography, Grid, Grow } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import SeriesItem from './SeriesItem';
 
-const useStyles = makeStyles((theme) => ({}));
+const useStyles = makeStyles((theme) => ({
+    text: {
+        fontSize: '1.5rem',
+        color: '#969696',
+        textAlign: 'center',
+    },
+}));
 
 const Bookmarks = ({ displayDetailView, seriesBookmarks }) => {
     const classes = useStyles();
 
     return (
         <Fragment>
-            {seriesBookmarks.length !== 0 && (
+            {seriesBookmarks.length !== 0 ? (
                 <Fragment>
-                    <Typography variant="h3">Recent</Typography>
+                    <Typography variant="h3">Bookmarks</Typography>
                     <Grid container spacing={5}>
                         {seriesBookmarks.map((show, index) => (
                             <Grid item xs={3} key={show.id}>
@@ -30,6 +36,10 @@ const Bookmarks = ({ displayDetailView, seriesBookmarks }) => {
                         ))}
                     </Grid>
                 </Fragment>
+            ) : (
+                <Typography variant="overline" className={classes.text}>
+                    You have no series bookmarked!
+                </Typography>
             )}
         </Fragment>
     );
