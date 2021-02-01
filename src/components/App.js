@@ -128,6 +128,7 @@ const App = () => {
     const [series, setSeries] = useState([]);
     const [seriesRecent, setSeriesRecent] = useState([]);
     const [seriesLatest, setSeriesLatest] = useState([]);
+    const [seriesBookmarks, setSeriesBookmarks] = useState([]);
     const [nav, setNav] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
     const [detailView, setDetailView] = useState(false);
@@ -146,12 +147,19 @@ const App = () => {
                         new Date(a.series_access.last_accessed)
                 );
                 setSeriesRecent(sortedRecent.slice(0, 4));
+
                 const sortedLatest = JSON.parse(loadedShows).sort(
                     (a, b) =>
                         new Date(b.series_access.updated_at) -
                         new Date(a.series_access.updated_at)
                 );
                 setSeriesLatest(sortedLatest.slice(0, 4));
+
+                const bookmarkedSeries = JSON.parse(loadedShows).filter(
+                    (show) => show.series_seasons[0].favorite === true
+                );
+                setSeriesBookmarks(bookmarkedSeries);
+
                 setSeries(JSON.parse(loadedShows));
             });
 
@@ -269,7 +277,10 @@ const App = () => {
                                 displayDetailView={displayDetailView}
                             />
                         ) : nav === 1 ? (
-                            <Bookmarks series={series} />
+                            <Bookmarks
+                                seriesBookmarks={seriesBookmarks}
+                                displayDetailView={displayDetailView}
+                            />
                         ) : (
                             <Browse series={series} />
                         )}
