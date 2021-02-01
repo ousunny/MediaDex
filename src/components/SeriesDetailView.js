@@ -10,7 +10,14 @@ import {
     ListItem,
     ListItemText,
 } from '@material-ui/core';
-import { Delete, Edit, Link, Refresh } from '@material-ui/icons';
+import {
+    Delete,
+    Edit,
+    Link,
+    Refresh,
+    Bookmark,
+    BookmarkBorder,
+} from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
@@ -105,28 +112,43 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                                 <Grid
                                     container
                                     item
-                                    xs={11}
+                                    xs={10}
                                     wrap="nowrap"
                                     alignItems="flex-start"
                                 >
-                                    <Typography variant="h3">
+                                    <Typography
+                                        variant="h3"
+                                        style={{ marginRight: '0.5rem' }}
+                                    >
                                         {show.title}
                                     </Typography>
-                                    <Button
-                                        style={{ marginLeft: '0.5rem' }}
-                                        className={classes.icon}
-                                        onClick={handleEditClick}
-                                    >
-                                        <Edit />
+                                    <Button>
+                                        {show.series_seasons.favorite ? (
+                                            <Bookmarks
+                                                style={{
+                                                    fontSize: '2.5rem',
+                                                    color: 'red',
+                                                }}
+                                            />
+                                        ) : (
+                                            <BookmarkBorder
+                                                style={{
+                                                    fontSize: '2.5rem',
+                                                }}
+                                            />
+                                        )}
                                     </Button>
                                 </Grid>
                                 <Grid
                                     container
                                     item
-                                    xs={1}
+                                    xs={2}
                                     className={classes.icon}
                                     justify="flex-end"
                                 >
+                                    <Button onClick={handleEditClick}>
+                                        <Edit />
+                                    </Button>
                                     <Button onClick={handleDeleteClick}>
                                         <Delete color="error" />
                                     </Button>
