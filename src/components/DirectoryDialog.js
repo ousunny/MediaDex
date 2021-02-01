@@ -45,6 +45,7 @@ const MediaAdd = ({ open, onClose, seriesUpdated, showId, directory }) => {
         event.preventDefault();
 
         ipcRenderer.send('series:directory_change', {
+            type: 'change',
             id: showId,
             directory_location: mediaPath,
         });

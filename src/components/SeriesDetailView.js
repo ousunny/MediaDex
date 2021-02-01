@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 import { Delete, Edit, Link, Refresh } from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
+const fs = require('fs');
 const path = require('path');
 import MediaEdit from './MediaEdit';
 import DirectoryDialog from './DirectoryDialog';
@@ -56,6 +57,16 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
 
     const handleEditClick = () => {
         editOpen ? setEditOpen(false) : setEditOpen(true);
+    };
+
+    const handleRefreshClick = () => {
+        ipcRenderer.send('series:directory_change', {
+            type: 'refresh',
+            id: show.id,
+            directory_location: show.series_seasons[0].directory_location,
+        });
+
+        seriesUpdated(show.id);
     };
 
     const handleDirectoryChangeClick = () => {
@@ -150,7 +161,7 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                         <Typography variant="h5">{`Episodes (${show.episodes.length})`}</Typography>
                     </Grid>
                     <Grid container item xs={2} justify="flex-end">
-                        <Button>
+                        <Button onClick={handleRefreshClick}>
                             <Refresh />
                         </Button>
                         <Button onClick={handleDirectoryChangeClick}>

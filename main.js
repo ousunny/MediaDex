@@ -5,6 +5,8 @@ const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
 const { ipcMain, dialog, protocol, shell } = require('electron');
 
+const exts = ['.mkv', '.mp4'];
+
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: `${app.getPath('userData')}/database.sqlite`,
@@ -261,25 +263,33 @@ ipcMain.on('series:edit', async (event, show) => {
 
 ipcMain.on('series:directory_change', async (event, update) => {
     try {
-        await models.SeriesSeasons.update(
-            { directory_location: update.directory_location },
-            { where: { series_id: update.id } }
-        );
+        if (update.type === 'change')
+            await models.SeriesSeasons.update(
+                { directory_location: update.directory_location },
+                { where: { series_id: update.id } }
+            );
 
         await models.Episodes.destroy({ where: { series_id: update.id } });
 
         fs.readdir(update.directory_location, async (err, filenames) => {
-            const episodes = filenames.map((filename, index) => {
-                const episodeNumber = parseInt(
-                    filename.split(' - ')[1].match(/[0-9]+/)[0]
-                );
+            const episodes = filenames.reduce((results, filename) => {
+                if (exts.indexOf(path.extname(filename)) >= 0) {
+                    const episodeNumber = parseInt(
+                        filename.split(' - ')[1].match(/[0-9]+/)[0]
+                    );
 
-                return {
-                    location: path.join(update.directory_location, filename),
-                    series_id: update.id,
-                    number: episodeNumber,
-                };
-            });
+                    results.push({
+                        location: path.join(
+                            update.directory_location,
+                            filename
+                        ),
+                        series_id: update.id,
+                        number: episodeNumber,
+                    });
+                }
+
+                return results;
+            }, []);
 
             await models.Episodes.bulkCreate(episodes);
         });
