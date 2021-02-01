@@ -121,6 +121,7 @@ ipcMain.on('series:load', (e, nav) => {
     switch (nav) {
         case 0:
             sendAllSeries();
+
             break;
     }
 });
@@ -364,8 +365,15 @@ ipcMain.on('media:delete', async (event, id) => {
     sendAllSeries();
 });
 
-ipcMain.on('episode:play', async (event, filePath) => {
-    shell.openExternal(path.join('file://', filePath));
+ipcMain.on('episode:play', async (event, episode) => {
+    shell.openExternal(path.join('file://', episode.location));
+
+    await models.SeriesAccesses.update(
+        { last_accessed: new Date(Date.now()) },
+        { where: { series_id: episode.seriesId } }
+    );
+
+    sendAllSeries();
 });
 
 //#endregion

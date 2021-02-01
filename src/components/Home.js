@@ -1,20 +1,20 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid, Fade, Grow } from '@material-ui/core';
 import SeriesItem from './SeriesItem';
 
 const useStyles = makeStyles((theme) => ({}));
 
-const Home = ({ displayDetailView, series, seriesLatest }) => {
+const Home = ({ displayDetailView, seriesRecent, seriesLatest }) => {
     const classes = useStyles();
 
     return (
         <Fragment>
-            {series.length !== 0 && (
+            {seriesRecent.length !== 0 && (
                 <Fragment>
                     <Typography variant="h3">Recent</Typography>
                     <Grid container spacing={5}>
-                        {series.map((show, index) => (
+                        {seriesRecent.map((show, index) => (
                             <Grid item xs={3} key={show.id}>
                                 <Grow in={true} timeout={200 * (index + 1)}>
                                     <div>

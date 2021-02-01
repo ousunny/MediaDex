@@ -51,8 +51,8 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
         displayDetailView(false, null);
     };
 
-    const handleEpisodeClick = (filePath) => {
-        ipcRenderer.send('episode:play', filePath);
+    const handleEpisodeClick = (episode) => {
+        ipcRenderer.send('episode:play', episode);
     };
 
     const handleEditClick = () => {
@@ -175,7 +175,10 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                                 button
                                 divider
                                 onClick={() =>
-                                    handleEpisodeClick(episode.location)
+                                    handleEpisodeClick({
+                                        seriesId: show.id,
+                                        location: episode.location,
+                                    })
                                 }
                             >
                                 <ListItemText
