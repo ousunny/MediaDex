@@ -10,7 +10,7 @@ import {
     ListItem,
     ListItemText,
 } from '@material-ui/core';
-import { Delete, Edit } from '@material-ui/icons';
+import { Delete, Edit, Link, Refresh } from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
 const path = require('path');
 import MediaEdit from './MediaEdit';
@@ -75,7 +75,6 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                         direction="column"
                         justify="space-between"
                         xs={9}
-                        spacing={3}
                     >
                         <Grid container item direction="column">
                             <Grid
@@ -102,11 +101,14 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                                         <Edit />
                                     </Button>
                                 </Grid>
-                                <Grid item xs={1}>
-                                    <Button
-                                        className={classes.icon}
-                                        onClick={handleDeleteClick}
-                                    >
+                                <Grid
+                                    container
+                                    item
+                                    xs={1}
+                                    className={classes.icon}
+                                    justify="flex-end"
+                                >
+                                    <Button onClick={handleDeleteClick}>
                                         <Delete color="error" />
                                     </Button>
                                 </Grid>
@@ -136,7 +138,17 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                 </Grid>
 
                 <Grid container item>
-                    <Typography variant="h5">{`Episodes (${show.episodes.length})`}</Typography>
+                    <Grid item xs={10}>
+                        <Typography variant="h5">{`Episodes (${show.episodes.length})`}</Typography>
+                    </Grid>
+                    <Grid container item xs={2} justify="flex-end">
+                        <Button>
+                            <Refresh />
+                        </Button>
+                        <Button>
+                            <Link />
+                        </Button>
+                    </Grid>
                     <List className={classes.episodes}>
                         {show.episodes.map((episode) => (
                             <ListItem
