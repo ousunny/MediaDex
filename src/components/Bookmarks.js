@@ -38,7 +38,7 @@ const Bookmarks = ({ displayDetailView, seriesBookmarks }) => {
                 </Fragment>
             ) : (
                 <Typography variant="overline" className={classes.text}>
-                    You have no series bookmarked!
+                    No results
                 </Typography>
             )}
         </Fragment>
