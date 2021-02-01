@@ -296,7 +296,7 @@ ipcMain.on('series:search', async (event, term) => {
     }
 });
 
-ipcMain.on('image:click', async (event, arg) => {
+ipcMain.on('image:click', async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
     });
@@ -307,14 +307,9 @@ ipcMain.on('image:click', async (event, arg) => {
     );
 });
 
-ipcMain.on('media:click', async (event, arg) => {
-    let properties;
-    arg === 'series'
-        ? (properties = ['openDirectory'])
-        : (properties = ['openFile']);
-
+ipcMain.on('media:click', async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
-        properties,
+        properties: ['openDirectory'],
     });
 
     mainWindow.webContents.send(

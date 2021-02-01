@@ -39,7 +39,6 @@ const seasons = [
 const MediaAdd = ({ open, onClose }) => {
     const classes = useStyles();
     const [title, setTitle] = useState('');
-    const [type, setType] = useState('series');
     const [currentSeason, setCurrentSeason] = useState(1);
     const [airingSeason, setAiringSeason] = useState('winter');
     const [airingYear, setAiringYear] = useState(new Date().getFullYear());
@@ -95,10 +94,6 @@ const MediaAdd = ({ open, onClose }) => {
         setTitle(event.target.value);
     };
 
-    const handleTypeChange = (event) => {
-        setType(event.target.value);
-    };
-
     const handleCurrentSeasonChange = (event) => {
         setCurrentSeason(event.target.value);
     };
@@ -112,11 +107,11 @@ const MediaAdd = ({ open, onClose }) => {
     };
 
     const handleImageClick = (event) => {
-        ipcRenderer.send('image:click', type);
+        ipcRenderer.send('image:click');
     };
 
     const handleMediaClick = (event) => {
-        ipcRenderer.send('media:click', type);
+        ipcRenderer.send('media:click');
     };
 
     const handleSummaryChange = (event) => {
@@ -149,7 +144,6 @@ const MediaAdd = ({ open, onClose }) => {
 
         const show = {
             title,
-            type,
             currentSeason,
             airingSeason,
             airingYear,
@@ -197,68 +191,18 @@ const MediaAdd = ({ open, onClose }) => {
 
                 <DialogContent style={{ overflowY: 'visible' }}>
                     <Grid container spacing={3}>
-                        {type === 'series' ? (
-                            <Grid item xs={9}>
-                                <TextField
-                                    required
-                                    autoFocus
-                                    fullWidth
-                                    value={title}
-                                    onChange={handleTitleChange}
-                                    placeholder="Title..."
-                                    helperText="Series Title (Required)"
-                                />
-                            </Grid>
-                        ) : type === 'episode' ? (
-                            <React.Fragment>
-                                <Grid item xs={7}>
-                                    <TextField
-                                        autoFocus
-                                        fullWidth
-                                        value={title}
-                                        onChange={handleTitleChange}
-                                        placeholder="Episode Title..."
-                                    />
-                                </Grid>
-                                <Grid item xs={2}>
-                                    <TextField
-                                        type="number"
-                                        fullWidth
-                                        placeholder="#"
-                                    />
-                                </Grid>
-                            </React.Fragment>
-                        ) : (
-                            <Grid item xs={9}>
-                                <TextField
-                                    autoFocus
-                                    fullWidth
-                                    value={title}
-                                    onChange={handleTitleChange}
-                                    placeholder="Title..."
-                                    helperText="Movie Title (Required)"
-                                />
-                            </Grid>
-                        )}
-                        <Grid item xs={3}>
+                        <Grid item xs={9}>
                             <TextField
-                                select
+                                required
+                                autoFocus
                                 fullWidth
-                                value={type}
-                                onChange={handleTypeChange}
-                                helperText="Type of Media"
-                            >
-                                {types.map((type) => (
-                                    <MenuItem
-                                        key={type.value}
-                                        value={type.value}
-                                    >
-                                        {type.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
+                                value={title}
+                                onChange={handleTitleChange}
+                                placeholder="Title..."
+                                helperText="Series Title (Required)"
+                            />
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                             <TextField
                                 required
                                 type="number"
@@ -268,7 +212,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 helperText="Current Season (Required)"
                             ></TextField>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                             <TextField
                                 select
                                 fullWidth
@@ -286,7 +230,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 ))}
                             </TextField>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                             <TextField
                                 required
                                 type="number"
