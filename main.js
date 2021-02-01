@@ -338,6 +338,19 @@ ipcMain.on('series:search', async (event, term) => {
     }
 });
 
+ipcMain.on('series:bookmark', async (event, bookmark) => {
+    try {
+        await models.SeriesSeasons.update(
+            { favorite: !bookmark.favorite },
+            { where: { series_id: bookmark.seriesId } }
+        );
+
+        sendAllSeries();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('image:click', async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
@@ -393,28 +406,6 @@ async function sendAllSeries() {
         });
 
         mainWindow.webContents.send('series:get', JSON.stringify(series));
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-async function sendLatestSeries(amount) {
-    try {
-        const series = await models.Series.findAll({
-            limit: amount,
-            include: [
-                {
-                    model: models.SeriesAccesses,
-                    required: true,
-                },
-            ],
-            order: [[models.SeriesAccesses, 'updated_at', 'DESC']],
-        });
-
-        mainWindow.webContents.send(
-            'series:get_latest',
-            JSON.stringify(series)
-        );
     } catch (err) {
         console.log(err);
     }

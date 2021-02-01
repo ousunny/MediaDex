@@ -58,6 +58,15 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
         displayDetailView(false, null);
     };
 
+    const handleBookmarkClick = () => {
+        ipcRenderer.send('series:bookmark', {
+            seriesId: show.id,
+            favorite: show.series_seasons[0].favorite,
+        });
+
+        seriesUpdated(show.id);
+    };
+
     const handleEpisodeClick = (episode) => {
         ipcRenderer.send('episode:play', episode);
     };
@@ -122,9 +131,9 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                                     >
                                         {show.title}
                                     </Typography>
-                                    <Button>
-                                        {show.series_seasons.favorite ? (
-                                            <Bookmarks
+                                    <Button onClick={handleBookmarkClick}>
+                                        {show.series_seasons[0].favorite ? (
+                                            <Bookmark
                                                 style={{
                                                     fontSize: '2.5rem',
                                                     color: 'red',
