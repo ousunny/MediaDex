@@ -1,9 +1,9 @@
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
 const { ipcMain, dialog, protocol, shell } = require('electron');
-const Series = require('./src/database/models/Series');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
@@ -251,6 +251,37 @@ ipcMain.on('series:edit', async (event, show) => {
                     },
                 });
             });
+        });
+
+        sendAllSeries();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+ipcMain.on('series:directory_change', async (event, update) => {
+    try {
+        await models.SeriesSeasons.update(
+            { directory_location: update.directory_location },
+            { where: { series_id: update.id } }
+        );
+
+        await models.Episodes.destroy({ where: { series_id: update.id } });
+
+        fs.readdir(update.directory_location, async (err, filenames) => {
+            const episodes = filenames.map((filename, index) => {
+                const episodeNumber = parseInt(
+                    filename.split(' - ')[1].match(/[0-9]+/)[0]
+                );
+
+                return {
+                    location: path.join(update.directory_location, filename),
+                    series_id: update.id,
+                    number: episodeNumber,
+                };
+            });
+
+            await models.Episodes.bulkCreate(episodes);
         });
 
         sendAllSeries();

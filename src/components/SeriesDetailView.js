@@ -14,6 +14,7 @@ import { Delete, Edit, Link, Refresh } from '@material-ui/icons';
 const { ipcRenderer } = require('electron');
 const path = require('path');
 import MediaEdit from './MediaEdit';
+import DirectoryDialog from './DirectoryDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
     const classes = useStyles();
     const [editOpen, setEditOpen] = useState(false);
+    const [directoryChangeOpen, setDirectoryChangeOpen] = useState(false);
 
     const handleDeleteClick = () => {
         ipcRenderer.send('media:delete', show.id);
@@ -54,6 +56,12 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
 
     const handleEditClick = () => {
         editOpen ? setEditOpen(false) : setEditOpen(true);
+    };
+
+    const handleDirectoryChangeClick = () => {
+        directoryChangeOpen
+            ? setDirectoryChangeOpen(false)
+            : setDirectoryChangeOpen(true);
     };
 
     return (
@@ -145,7 +153,7 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                         <Button>
                             <Refresh />
                         </Button>
-                        <Button>
+                        <Button onClick={handleDirectoryChangeClick}>
                             <Link />
                         </Button>
                     </Grid>
@@ -167,6 +175,14 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
                     </List>
                 </Grid>
             </Grid>
+
+            <DirectoryDialog
+                open={directoryChangeOpen}
+                onClose={handleDirectoryChangeClick}
+                seriesUpdated={seriesUpdated}
+                showId={show.id}
+                directory={show.series_seasons[0].directory_location}
+            />
 
             <MediaEdit
                 open={editOpen}
