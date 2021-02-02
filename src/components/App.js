@@ -129,6 +129,7 @@ const App = () => {
     const [seriesRecent, setSeriesRecent] = useState([]);
     const [seriesLatest, setSeriesLatest] = useState([]);
     const [seriesBookmarks, setSeriesBookmarks] = useState([]);
+    const [seriesBrowse, setSeriesBrowse] = useState([]);
     const [nav, setNav] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
     const [detailView, setDetailView] = useState(false);
@@ -160,7 +161,13 @@ const App = () => {
                 );
                 setSeriesBookmarks(bookmarkedSeries);
 
+                setSeriesBrowse(JSON.parse(loadedShows));
+
                 setSeries(JSON.parse(loadedShows));
+            });
+
+            ipcRenderer.on('series:browse_get', (e, loadedShows) => {
+                setSeriesBrowse(JSON.parse(loadedShows));
             });
 
             loaded.current = true;
@@ -282,7 +289,10 @@ const App = () => {
                                 displayDetailView={displayDetailView}
                             />
                         ) : (
-                            <Browse series={series} />
+                            <Browse
+                                seriesBrowse={seriesBrowse}
+                                displayDetailView={displayDetailView}
+                            />
                         )}
                     </Fragment>
                 ) : (

@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Browse = ({ displayDetailView }) => {
+const Browse = ({ displayDetailView, seriesBrowse }) => {
     const classes = useStyles();
     const [series, setSeries] = React.useState([]);
     const [selectedLetter, setSelectedLetter] = React.useState('');
@@ -24,10 +24,6 @@ const Browse = ({ displayDetailView }) => {
             setAlphabet(generateAlphabet('A', 'Z'));
 
             ipcRenderer.send('series:browse', 'ALL');
-
-            ipcRenderer.on('series:browse_get', (e, loadedShows) => {
-                setSeries(JSON.parse(loadedShows));
-            });
 
             loaded.current = true;
         }
@@ -65,7 +61,7 @@ const Browse = ({ displayDetailView }) => {
                     ))}
                 </Grid>
                 <Grid container item xs={12} spacing={3}>
-                    {series.map((show, index) => (
+                    {seriesBrowse.map((show, index) => (
                         <Grid item xs={3} key={show.id}>
                             <Grow in={true} timeout={200 * (index + 1)}>
                                 <div>
