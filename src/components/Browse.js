@@ -1,7 +1,9 @@
 import React, { Fragment, useEffect } from 'react';
-import { Grid, Button, Typography } from '@material-ui/core';
+import { Grid, Button, Typography, Grow } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
+import { ipcRenderer } from 'electron';
+import SeriesItem from './SeriesItem';
 
 const useStyles = makeStyles((theme) => ({
     selected: {
@@ -10,8 +12,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Browse = () => {
+const Browse = ({ displayDetailView }) => {
     const classes = useStyles();
+    const [series, setSeries] = React.useState([]);
     const [selectedLetter, setSelectedLetter] = React.useState('');
     const [alphabet, setAlphabet] = React.useState([]);
     const loaded = React.useRef(false);
@@ -20,12 +23,18 @@ const Browse = () => {
         if (!loaded.current) {
             setAlphabet(generateAlphabet('A', 'Z'));
 
+            ipcRenderer.send('series:browse', 'ALL');
+
+            ipcRenderer.on('series:browse_get', (e, loadedShows) => {
+                setSeries(JSON.parse(loadedShows));
+            });
+
             loaded.current = true;
         }
     }, []);
 
     const generateAlphabet = (start, end) => {
-        let alphabetArray = [];
+        let alphabetArray = ['ALL'];
         for (let i = start.charCodeAt(0); i <= end.charCodeAt(0); i++) {
             alphabetArray.push(String.fromCharCode(i));
         }
@@ -35,6 +44,8 @@ const Browse = () => {
 
     const handleLetterClick = (letter) => {
         setSelectedLetter(letter);
+
+        ipcRenderer.send('series:browse', letter);
     };
 
     return (
@@ -51,6 +62,20 @@ const Browse = () => {
                         >
                             <Typography variant="button">{letter}</Typography>
                         </Button>
+                    ))}
+                </Grid>
+                <Grid container item xs={12} spacing={3}>
+                    {series.map((show, index) => (
+                        <Grid item xs={3} key={show.id}>
+                            <Grow in={true} timeout={200 * (index + 1)}>
+                                <div>
+                                    <SeriesItem
+                                        displayDetailView={displayDetailView}
+                                        show={show}
+                                    />
+                                </div>
+                            </Grow>
+                        </Grid>
                     ))}
                 </Grid>
             </Grid>

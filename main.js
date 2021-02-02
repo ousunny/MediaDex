@@ -338,6 +338,56 @@ ipcMain.on('series:search', async (event, term) => {
     }
 });
 
+ipcMain.on('series:browse', async (event, letter) => {
+    if (letter === 'ALL') {
+        try {
+            const series = await models.Series.findAll({
+                include: [
+                    models.Episodes,
+                    models.SeriesAccesses,
+                    models.SeriesSeasons,
+                    {
+                        model: models.SeriesTags,
+                        include: [models.Tags],
+                    },
+                ],
+            });
+
+            mainWindow.webContents.send(
+                'series:browse_get',
+                JSON.stringify(series)
+            );
+        } catch (err) {
+            console.log(err);
+        }
+        return;
+    }
+
+    try {
+        const series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                    required: false,
+                },
+            ],
+            required: false,
+            where: { '$series.title$': { [Op.like]: `${letter}%` } },
+        });
+
+        mainWindow.webContents.send(
+            'series:browse_get',
+            JSON.stringify(series)
+        );
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('series:bookmark', async (event, bookmark) => {
     try {
         await models.SeriesSeasons.update(
