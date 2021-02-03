@@ -126,6 +126,18 @@ ipcMain.on('series:load', (e, nav) => {
     }
 });
 
+ipcMain.on('series:load_details', (e, showId) => {
+    sendSeriesDetails(showId);
+});
+
+ipcMain.on('series:load_recent', async (e, amount) => {
+    sendRecentSeries(amount);
+});
+
+ipcMain.on('series:load_latest', async (e, amount) => {
+    sendLatestSeries(amount);
+});
+
 ipcMain.on('series:add', async (e, show) => {
     try {
         await models.Series.create({
@@ -176,7 +188,7 @@ ipcMain.on('series:add', async (e, show) => {
             }
         });
 
-        sendAllSeries();
+        sendLatestSeries(4);
     } catch (err) {
         console.log(err);
     }
@@ -256,7 +268,7 @@ ipcMain.on('series:edit', async (event, show) => {
             });
         });
 
-        sendAllSeries();
+        sendSeriesDetails(show.id);
     } catch (err) {
         console.log(err);
     }
@@ -295,7 +307,7 @@ ipcMain.on('series:directory_change', async (event, update) => {
             await models.Episodes.bulkCreate(episodes);
         });
 
-        sendAllSeries();
+        sendSeriesDetails(update.id);
     } catch (err) {
         console.log(err);
     }
@@ -436,7 +448,7 @@ ipcMain.on('episode:play', async (event, episode) => {
         { where: { series_id: episode.seriesId } }
     );
 
-    sendAllSeries();
+    sendRecentSeries(4);
 });
 
 //#endregion
@@ -456,6 +468,88 @@ async function sendAllSeries() {
         });
 
         mainWindow.webContents.send('series:get', JSON.stringify(series));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendSeriesDetails(showId) {
+    try {
+        const show = await models.Series.findOne({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                },
+            ],
+            where: { id: showId },
+        });
+
+        mainWindow.webContents.send('series:get_details', JSON.stringify(show));
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendRecentSeries(amount) {
+    try {
+        let series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                {
+                    model: models.SeriesAccesses,
+                    required: false,
+                },
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                },
+            ],
+            required: false,
+            limit: amount,
+            order: [[models.SeriesAccesses, 'last_accessed', 'DESC']],
+        });
+
+        series = series.filter(
+            (show) => show.series_access.last_accessed !== null
+        );
+
+        console.log(series);
+
+        mainWindow.webContents.send(
+            'series:get_recent',
+            JSON.stringify(series)
+        );
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendLatestSeries(amount) {
+    try {
+        const series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                { model: models.SeriesAccesses, required: false },
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                },
+            ],
+            required: false,
+            limit: amount,
+            order: [[models.SeriesAccesses, 'updated_at', 'DESC']],
+        });
+
+        mainWindow.webContents.send(
+            'series:get_latest',
+            JSON.stringify(series)
+        );
     } catch (err) {
         console.log(err);
     }

@@ -15,7 +15,7 @@ const path = require('path');
 
 const useStyles = makeStyles((theme) => {});
 
-const MediaAdd = ({ open, onClose, seriesUpdated, showId, directory }) => {
+const MediaAdd = ({ open, onClose, showId, directory }) => {
     const classes = useStyles();
     const [mediaPath, setMediaPath] = useState(directory);
     const loaded = React.useRef(false);
@@ -49,8 +49,6 @@ const MediaAdd = ({ open, onClose, seriesUpdated, showId, directory }) => {
             id: showId,
             directory_location: mediaPath,
         });
-
-        seriesUpdated(showId);
 
         onClose();
     };

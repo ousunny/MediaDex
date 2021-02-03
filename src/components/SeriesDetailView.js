@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
+const SeriesDetailView = ({ displayDetailView, show }) => {
     const classes = useStyles();
     const [editOpen, setEditOpen] = useState(false);
     const [directoryChangeOpen, setDirectoryChangeOpen] = useState(false);
@@ -63,8 +63,6 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
             seriesId: show.id,
             favorite: show.series_seasons[0].favorite,
         });
-
-        seriesUpdated(show.id);
     };
 
     const handleEpisodeClick = (episode) => {
@@ -81,8 +79,6 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
             id: show.id,
             directory_location: show.series_seasons[0].directory_location,
         });
-
-        seriesUpdated(show.id);
     };
 
     const handleDirectoryChangeClick = () => {
@@ -224,17 +220,11 @@ const SeriesDetailView = ({ displayDetailView, seriesUpdated, show }) => {
             <DirectoryDialog
                 open={directoryChangeOpen}
                 onClose={handleDirectoryChangeClick}
-                seriesUpdated={seriesUpdated}
                 showId={show.id}
                 directory={show.series_seasons[0].directory_location}
             />
 
-            <MediaEdit
-                open={editOpen}
-                onClose={handleEditClick}
-                seriesUpdated={seriesUpdated}
-                show={show}
-            />
+            <MediaEdit open={editOpen} onClose={handleEditClick} show={show} />
         </Fragment>
     );
 };

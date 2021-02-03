@@ -35,7 +35,7 @@ const seasons = [
     { value: 'fall', label: 'Fall' },
 ];
 
-const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
+const MediaEdit = ({ open, onClose, show }) => {
     const classes = useStyles();
     const [title, setTitle] = useState(show.title);
     const [currentSeason, setCurrentSeason] = useState(
@@ -119,7 +119,6 @@ const MediaEdit = ({ open, onClose, seriesUpdated, show }) => {
         };
 
         ipcRenderer.send('series:edit', updateShow);
-        seriesUpdated(show.id);
 
         onClose();
     };

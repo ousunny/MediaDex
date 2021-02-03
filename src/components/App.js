@@ -142,19 +142,19 @@ const App = () => {
             ipcRenderer.send('series:load', nav);
 
             ipcRenderer.on('series:get', (e, loadedShows) => {
-                const sortedRecent = JSON.parse(loadedShows).sort(
-                    (a, b) =>
-                        new Date(b.series_access.last_accessed) -
-                        new Date(a.series_access.last_accessed)
-                );
-                setSeriesRecent(sortedRecent.slice(0, 4));
+                // const sortedRecent = JSON.parse(loadedShows).sort(
+                //     (a, b) =>
+                //         new Date(b.series_access.last_accessed) -
+                //         new Date(a.series_access.last_accessed)
+                // );
+                // setSeriesRecent(sortedRecent.slice(0, 4));
 
-                const sortedLatest = JSON.parse(loadedShows).sort(
-                    (a, b) =>
-                        new Date(b.series_access.updated_at) -
-                        new Date(a.series_access.updated_at)
-                );
-                setSeriesLatest(sortedLatest.slice(0, 4));
+                // const sortedLatest = JSON.parse(loadedShows).sort(
+                //     (a, b) =>
+                //         new Date(b.series_access.updated_at) -
+                //         new Date(a.series_access.updated_at)
+                // );
+                // setSeriesLatest(sortedLatest.slice(0, 4));
 
                 const bookmarkedSeries = JSON.parse(loadedShows).filter(
                     (show) => show.series_seasons[0].favorite === true
@@ -170,16 +170,16 @@ const App = () => {
                 setSeriesBrowse(JSON.parse(loadedShows));
             });
 
+            ipcRenderer.on('series:get_details', (e, showDetails) => {
+                setDetailShow(JSON.parse(showDetails));
+                setDetailView(true);
+            });
+
             loaded.current = true;
         }
 
-        if (detailView) {
-            const currentShowIndex = series.findIndex(
-                (show) => show.id === currentShowId
-            );
-            currentShowIndex >= 0 && setDetailShow(series[currentShowIndex]);
-        }
-    }, [series]);
+        ipcRenderer.send('series:load', nav);
+    }, [detailShow]);
 
     const handleBackClick = () => {
         setDetailView(false);
@@ -196,14 +196,9 @@ const App = () => {
     };
 
     function displayDetailView(display, show) {
-        setDetailView(display);
-        setDetailShow(show);
-    }
-
-    function seriesUpdated(id) {
-        setCurrentShowId(id);
-        // const currentShowIndex = series.findIndex((show) => show.id === id);
-        // currentShowIndex >= 0 && setDetailShow(series[currentShowIndex]);
+        // setDetailView(display);
+        // setDetailShow(show);
+        ipcRenderer.send('series:load_details', show.id);
     }
 
     return (
@@ -299,7 +294,6 @@ const App = () => {
                     <Fragment>
                         <SeriesDetailView
                             displayDetailView={displayDetailView}
-                            seriesUpdated={seriesUpdated}
                             show={detailShow}
                         />
                     </Fragment>

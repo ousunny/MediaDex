@@ -1,12 +1,32 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid, Fade, Grow } from '@material-ui/core';
 import SeriesItem from './SeriesItem';
+import { ipcRenderer } from 'electron';
 
 const useStyles = makeStyles((theme) => ({}));
 
-const Home = ({ displayDetailView, seriesRecent, seriesLatest }) => {
+const Home = ({ displayDetailView }) => {
     const classes = useStyles();
+    const [seriesRecent, setSeriesRecent] = useState([]);
+    const [seriesLatest, setSeriesLatest] = useState([]);
+    const loaded = React.useRef(false);
+
+    useEffect(() => {
+        if (!loaded.current) {
+            ipcRenderer.send('series:load_recent', 4);
+            ipcRenderer.send('series:load_latest', 4);
+
+            ipcRenderer.on('series:get_recent', (e, loadedShows) => {
+                setSeriesRecent(JSON.parse(loadedShows));
+            });
+            ipcRenderer.on('series:get_latest', (e, loadedShows) => {
+                setSeriesLatest(JSON.parse(loadedShows));
+                console.log(JSON.parse(loadedShows));
+            });
+            loaded.current = true;
+        }
+    }, []);
 
     return (
         <Fragment>
