@@ -22,7 +22,6 @@ const Home = ({ displayDetailView }) => {
             });
             ipcRenderer.on('series:get_latest', (e, loadedShows) => {
                 setSeriesLatest(JSON.parse(loadedShows));
-                console.log(JSON.parse(loadedShows));
             });
             loaded.current = true;
         }

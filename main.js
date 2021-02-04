@@ -407,7 +407,7 @@ ipcMain.on('series:bookmark', async (event, bookmark) => {
             { where: { series_id: bookmark.seriesId } }
         );
 
-        sendAllSeries();
+        sendSeriesDetails(bookmark.seriesId);
     } catch (err) {
         console.log(err);
     }
@@ -509,16 +509,16 @@ async function sendRecentSeries(amount) {
                     include: [models.Tags],
                 },
             ],
+            where: {
+                '$series_access.last_accessed$': { [Op.ne]: null },
+            },
+            subQuery: false,
             required: false,
-            limit: amount,
+
             order: [[models.SeriesAccesses, 'last_accessed', 'DESC']],
         });
 
-        series = series.filter(
-            (show) => show.series_access.last_accessed !== null
-        );
-
-        console.log(series);
+        series = series.slice(0, amount);
 
         mainWindow.webContents.send(
             'series:get_recent',
@@ -531,7 +531,7 @@ async function sendRecentSeries(amount) {
 
 async function sendLatestSeries(amount) {
     try {
-        const series = await models.Series.findAll({
+        let series = await models.Series.findAll({
             include: [
                 models.Episodes,
                 { model: models.SeriesAccesses, required: false },
@@ -541,10 +541,12 @@ async function sendLatestSeries(amount) {
                     include: [models.Tags],
                 },
             ],
+            subQuery: false,
             required: false,
-            limit: amount,
             order: [[models.SeriesAccesses, 'updated_at', 'DESC']],
         });
+
+        series = series.slice(0, amount);
 
         mainWindow.webContents.send(
             'series:get_latest',
