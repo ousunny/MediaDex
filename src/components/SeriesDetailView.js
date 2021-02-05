@@ -90,7 +90,7 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
     return (
         <Fragment>
             <Grid container spacing={3}>
-                <Grid container item spacing={3}>
+                <Grid container item spacing={3} xs={12}>
                     <Grid item xs={3}>
                         <img
                             className={classes.img}
@@ -117,7 +117,7 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
                                 <Grid
                                     container
                                     item
-                                    xs={10}
+                                    xs={8}
                                     wrap="nowrap"
                                     alignItems="flex-start"
                                 >
@@ -127,30 +127,30 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
                                     >
                                         {show.title}
                                     </Typography>
+                                </Grid>
+                                <Grid
+                                    container
+                                    item
+                                    xs={4}
+                                    className={classes.icon}
+                                    justify="flex-end"
+                                >
                                     <Button onClick={handleBookmarkClick}>
                                         {show.series_seasons[0].favorite ? (
                                             <Bookmark
                                                 style={{
-                                                    fontSize: '2.5rem',
+                                                    fontSize: '2rem',
                                                     color: 'red',
                                                 }}
                                             />
                                         ) : (
                                             <BookmarkBorder
                                                 style={{
-                                                    fontSize: '2.5rem',
+                                                    fontSize: '2rem',
                                                 }}
                                             />
                                         )}
                                     </Button>
-                                </Grid>
-                                <Grid
-                                    container
-                                    item
-                                    xs={2}
-                                    className={classes.icon}
-                                    justify="flex-end"
-                                >
                                     <Button onClick={handleEditClick}>
                                         <Edit />
                                     </Button>
@@ -183,7 +183,7 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
                     </Grid>
                 </Grid>
 
-                <Grid container item>
+                <Grid container item xs={12}>
                     <Grid item xs={10}>
                         <Typography variant="h5">{`Episodes (${show.episodes.length})`}</Typography>
                     </Grid>
