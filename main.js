@@ -117,15 +117,6 @@ async function createMainWindow() {
 //#endregion
 
 //#region ipcMain
-ipcMain.on('series:load', (e, nav) => {
-    switch (nav) {
-        case 0:
-            sendAllSeries();
-
-            break;
-    }
-});
-
 ipcMain.on('series:load_details', (e, showId) => {
     sendSeriesDetails(showId);
 });
@@ -319,7 +310,7 @@ ipcMain.on('series:directory_change', async (event, update) => {
 
 ipcMain.on('series:search', async (event, term) => {
     if (term === '') {
-        sendAllSeries();
+        sendSeriesBrowse('ALL');
         return;
     }
 
@@ -348,53 +339,6 @@ ipcMain.on('series:search', async (event, term) => {
             },
         });
 
-        mainWindow.webContents.send('series:get', JSON.stringify(series));
-    } catch (err) {
-        console.log(err);
-    }
-});
-
-ipcMain.on('series:browse', async (event, letter) => {
-    if (letter === 'ALL') {
-        try {
-            const series = await models.Series.findAll({
-                include: [
-                    models.Episodes,
-                    models.SeriesAccesses,
-                    models.SeriesSeasons,
-                    {
-                        model: models.SeriesTags,
-                        include: [models.Tags],
-                    },
-                ],
-            });
-
-            mainWindow.webContents.send(
-                'series:browse_get',
-                JSON.stringify(series)
-            );
-        } catch (err) {
-            console.log(err);
-        }
-        return;
-    }
-
-    try {
-        const series = await models.Series.findAll({
-            include: [
-                models.Episodes,
-                models.SeriesAccesses,
-                models.SeriesSeasons,
-                {
-                    model: models.SeriesTags,
-                    include: [models.Tags],
-                    required: false,
-                },
-            ],
-            required: false,
-            where: { '$series.title$': { [Op.like]: `${letter}%` } },
-        });
-
         mainWindow.webContents.send(
             'series:browse_get',
             JSON.stringify(series)
@@ -402,6 +346,10 @@ ipcMain.on('series:browse', async (event, letter) => {
     } catch (err) {
         console.log(err);
     }
+});
+
+ipcMain.on('series:browse', async (event, letter) => {
+    sendSeriesBrowse(letter);
 });
 
 ipcMain.on('series:bookmark', async (event, bookmark) => {
@@ -455,26 +403,6 @@ ipcMain.on('episode:play', async (event, episode) => {
 });
 
 //#endregion
-
-async function sendAllSeries() {
-    try {
-        const series = await models.Series.findAll({
-            include: [
-                models.Episodes,
-                models.SeriesAccesses,
-                models.SeriesSeasons,
-                {
-                    model: models.SeriesTags,
-                    include: [models.Tags],
-                },
-            ],
-        });
-
-        mainWindow.webContents.send('series:get', JSON.stringify(series));
-    } catch (err) {
-        console.log(err);
-    }
-}
 
 async function sendSeriesDetails(showId) {
     try {
@@ -583,6 +511,56 @@ async function sendBookmarks() {
 
         mainWindow.webContents.send(
             'series:get_bookmarks',
+            JSON.stringify(series)
+        );
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendSeriesBrowse(letter) {
+    if (letter === 'ALL') {
+        try {
+            const series = await models.Series.findAll({
+                include: [
+                    models.Episodes,
+                    models.SeriesAccesses,
+                    models.SeriesSeasons,
+                    {
+                        model: models.SeriesTags,
+                        include: [models.Tags],
+                    },
+                ],
+            });
+
+            mainWindow.webContents.send(
+                'series:browse_get',
+                JSON.stringify(series)
+            );
+        } catch (err) {
+            console.log(err);
+        }
+        return;
+    }
+
+    try {
+        const series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                    required: false,
+                },
+            ],
+            required: false,
+            where: { '$series.title$': { [Op.like]: `${letter}%` } },
+        });
+
+        mainWindow.webContents.send(
+            'series:browse_get',
             JSON.stringify(series)
         );
     } catch (err) {

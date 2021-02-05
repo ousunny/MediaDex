@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SearchBar = () => {
+const SearchBar = ({ handleNavClick }) => {
     const classes = useStyles();
     const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -41,6 +41,7 @@ const SearchBar = () => {
                 variant="outlined"
                 fullWidth
                 value={searchTerm}
+                onClick={() => handleNavClick(2)}
                 onChange={handleSearchChange}
                 classes={{
                     root: classes.inputRoot,

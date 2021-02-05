@@ -160,8 +160,6 @@ const App = () => {
 
             loaded.current = true;
         }
-
-        ipcRenderer.send('series:load', nav);
     }, [detailShow]);
 
     const handleBackClick = () => {
@@ -243,7 +241,7 @@ const App = () => {
                     <Fragment>
                         <div className={classes.actions}>
                             <div className={classes.searchBar}>
-                                <SearchBar />
+                                <SearchBar handleNavClick={handleNavClick} />
                             </div>
 
                             <Button
