@@ -170,7 +170,6 @@ const App = () => {
 
     const handleNavClick = (index) => {
         setDetailView(false);
-        ipcRenderer.send('series:load', index);
         setNav(index);
     };
 
@@ -179,8 +178,6 @@ const App = () => {
     };
 
     function displayDetailView(display, show) {
-        // setDetailView(display);
-        // setDetailShow(show);
         display
             ? ipcRenderer.send('series:load_details', show.id)
             : setDetailView(false);
@@ -270,8 +267,8 @@ const App = () => {
                             />
                         ) : (
                             <Browse
-                                seriesBrowse={seriesBrowse}
                                 displayDetailView={displayDetailView}
+                                seriesBrowse={seriesBrowse}
                             />
                         )}
                     </Fragment>
