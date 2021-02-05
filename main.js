@@ -441,7 +441,6 @@ ipcMain.on('media:click', async (event) => {
 
 ipcMain.on('media:delete', async (event, id) => {
     models.Series.destroy({ where: { id } });
-    sendAllSeries();
 });
 
 ipcMain.on('episode:play', async (event, episode) => {

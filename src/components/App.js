@@ -181,7 +181,9 @@ const App = () => {
     function displayDetailView(display, show) {
         // setDetailView(display);
         // setDetailShow(show);
-        ipcRenderer.send('series:load_details', show.id);
+        display
+            ? ipcRenderer.send('series:load_details', show.id)
+            : setDetailView(false);
     }
 
     return (

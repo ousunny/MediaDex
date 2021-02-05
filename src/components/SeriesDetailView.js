@@ -54,8 +54,8 @@ const SeriesDetailView = ({ displayDetailView, show }) => {
     const [directoryChangeOpen, setDirectoryChangeOpen] = useState(false);
 
     const handleDeleteClick = () => {
-        ipcRenderer.send('media:delete', show.id);
         displayDetailView(false, null);
+        ipcRenderer.send('media:delete', show.id);
     };
 
     const handleBookmarkClick = () => {
