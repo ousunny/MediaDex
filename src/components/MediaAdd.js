@@ -23,6 +23,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const exts = ['.mkv', '.mp4'];
+
 const types = [
     { value: 'series', label: 'Series' },
     { value: 'episode', label: 'Episode' },
@@ -68,20 +70,30 @@ const MediaAdd = ({ open, onClose }) => {
                 setMediaPath(directoryPath);
 
                 fs.readdir(directoryPath, (err, filenames) => {
-                    setEpisodes(
-                        filenames.map((filename, index) => {
-                            const episodeNumber = parseInt(
-                                filename.split(' - ')[1].match(/[0-9]+/)[0]
-                            );
+                    const filteredEpisodes = filenames.reduce(
+                        (results, filename, index) => {
+                            if (exts.indexOf(path.extname(filename)) >= 0) {
+                                const episodeNumber = parseInt(
+                                    filename.split(' - ')[1].match(/[0-9]+/)[0]
+                                );
 
-                            return {
-                                index,
-                                filePath: path.join(directoryPath, filename),
-                                filename: filename,
-                                episodeNumber,
-                            };
-                        })
+                                results.push({
+                                    index,
+                                    filePath: path.join(
+                                        directoryPath,
+                                        filename
+                                    ),
+                                    filename,
+                                    episodeNumber,
+                                });
+                            }
+
+                            return results;
+                        },
+                        []
                     );
+
+                    setEpisodes(filteredEpisodes);
                 });
             });
             //#endregion
