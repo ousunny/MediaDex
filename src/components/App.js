@@ -125,7 +125,6 @@ const useStyles = makeStyles((theme) => ({
 
 const App = () => {
     const classes = useStyles();
-    const [series, setSeries] = useState([]);
     const [seriesRecent, setSeriesRecent] = useState([]);
     const [seriesLatest, setSeriesLatest] = useState([]);
     const [seriesBookmarks, setSeriesBookmarks] = useState([]);
@@ -139,31 +138,15 @@ const App = () => {
 
     useEffect(() => {
         if (!loaded.current) {
-            ipcRenderer.send('series:load', nav);
+            ipcRenderer.on('series:get_recent', (e, loadedShows) => {
+                setSeriesRecent(JSON.parse(loadedShows));
+            });
+            ipcRenderer.on('series:get_latest', (e, loadedShows) => {
+                setSeriesLatest(JSON.parse(loadedShows));
+            });
 
-            ipcRenderer.on('series:get', (e, loadedShows) => {
-                // const sortedRecent = JSON.parse(loadedShows).sort(
-                //     (a, b) =>
-                //         new Date(b.series_access.last_accessed) -
-                //         new Date(a.series_access.last_accessed)
-                // );
-                // setSeriesRecent(sortedRecent.slice(0, 4));
-
-                // const sortedLatest = JSON.parse(loadedShows).sort(
-                //     (a, b) =>
-                //         new Date(b.series_access.updated_at) -
-                //         new Date(a.series_access.updated_at)
-                // );
-                // setSeriesLatest(sortedLatest.slice(0, 4));
-
-                const bookmarkedSeries = JSON.parse(loadedShows).filter(
-                    (show) => show.series_seasons[0].favorite === true
-                );
-                setSeriesBookmarks(bookmarkedSeries);
-
-                setSeriesBrowse(JSON.parse(loadedShows));
-
-                setSeries(JSON.parse(loadedShows));
+            ipcRenderer.on('series:get_bookmarks', (e, loadedShows) => {
+                setSeriesBookmarks(JSON.parse(loadedShows));
             });
 
             ipcRenderer.on('series:browse_get', (e, loadedShows) => {
@@ -274,14 +257,14 @@ const App = () => {
 
                         {nav === 0 ? (
                             <Home
+                                displayDetailView={displayDetailView}
                                 seriesRecent={seriesRecent}
                                 seriesLatest={seriesLatest}
-                                displayDetailView={displayDetailView}
                             />
                         ) : nav === 1 ? (
                             <Bookmarks
-                                seriesBookmarks={seriesBookmarks}
                                 displayDetailView={displayDetailView}
+                                seriesBookmarks={seriesBookmarks}
                             />
                         ) : (
                             <Browse

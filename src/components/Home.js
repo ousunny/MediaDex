@@ -6,10 +6,8 @@ import { ipcRenderer } from 'electron';
 
 const useStyles = makeStyles((theme) => ({}));
 
-const Home = ({ displayDetailView }) => {
+const Home = ({ displayDetailView, seriesRecent, seriesLatest }) => {
     const classes = useStyles();
-    const [seriesRecent, setSeriesRecent] = useState([]);
-    const [seriesLatest, setSeriesLatest] = useState([]);
     const loaded = React.useRef(false);
 
     useEffect(() => {
@@ -17,12 +15,6 @@ const Home = ({ displayDetailView }) => {
             ipcRenderer.send('series:load_recent', 4);
             ipcRenderer.send('series:load_latest', 4);
 
-            ipcRenderer.on('series:get_recent', (e, loadedShows) => {
-                setSeriesRecent(JSON.parse(loadedShows));
-            });
-            ipcRenderer.on('series:get_latest', (e, loadedShows) => {
-                setSeriesLatest(JSON.parse(loadedShows));
-            });
             loaded.current = true;
         }
     }, []);

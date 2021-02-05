@@ -138,6 +138,10 @@ ipcMain.on('series:load_latest', async (e, amount) => {
     sendLatestSeries(amount);
 });
 
+ipcMain.on('series:load_bookmarks', async () => {
+    sendBookmarks();
+});
+
 ipcMain.on('series:add', async (e, show) => {
     try {
         await models.Series.create({
@@ -550,6 +554,36 @@ async function sendLatestSeries(amount) {
 
         mainWindow.webContents.send(
             'series:get_latest',
+            JSON.stringify(series)
+        );
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function sendBookmarks() {
+    try {
+        let series = await models.Series.findAll({
+            include: [
+                models.Episodes,
+                models.SeriesAccesses,
+                models.SeriesSeasons,
+                {
+                    model: models.SeriesTags,
+                    include: [models.Tags],
+                },
+            ],
+            subQuery: false,
+            required: false,
+            where: {
+                '$series_seasons.favorite$': true,
+            },
+        });
+
+        console.log(series);
+
+        mainWindow.webContents.send(
+            'series:get_bookmarks',
             JSON.stringify(series)
         );
     } catch (err) {

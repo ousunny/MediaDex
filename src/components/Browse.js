@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Browse = ({ displayDetailView, seriesBrowse }) => {
     const classes = useStyles();
-    const [series, setSeries] = React.useState([]);
     const [selectedLetter, setSelectedLetter] = React.useState('');
     const [alphabet, setAlphabet] = React.useState([]);
     const loaded = React.useRef(false);

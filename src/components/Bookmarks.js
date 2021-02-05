@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Typography, Grid, Grow } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { ipcRenderer } from 'electron';
 import SeriesItem from './SeriesItem';
 
 const useStyles = makeStyles((theme) => ({
@@ -13,6 +14,15 @@ const useStyles = makeStyles((theme) => ({
 
 const Bookmarks = ({ displayDetailView, seriesBookmarks }) => {
     const classes = useStyles();
+    const loaded = React.useRef(false);
+
+    useEffect(() => {
+        if (!loaded.current) {
+            ipcRenderer.send('series:load_bookmarks');
+
+            loaded.current = true;
+        }
+    }, []);
 
     return (
         <Fragment>
