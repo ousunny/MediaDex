@@ -3,7 +3,7 @@ const path = require('path');
 const url = require('url');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
-const { ipcMain, dialog, protocol, shell } = require('electron');
+const { ipcMain, dialog, protocol, shell, Menu } = require('electron');
 
 const exts = ['.mkv', '.mp4'];
 
@@ -14,6 +14,7 @@ const sequelize = new Sequelize({
 
 let mainWindow;
 let isDev = false;
+const isMac = process.platform === 'darwin' ? true : false;
 
 process.env.NODE_ENV === 'development' ? (isDev = true) : (isDev = false);
 
@@ -227,9 +228,6 @@ ipcMain.on('series:edit', async (event, show) => {
 
                 return result;
             }, []);
-
-            console.log(tagsToDelete);
-            console.log(remainingTags);
 
             const remainingTagsObj = remainingTags.map((tag) => ({
                 tag_name: tag,
@@ -527,8 +525,6 @@ async function sendBookmarks() {
             },
         });
 
-        console.log(series);
-
         mainWindow.webContents.send(
             'series:get_bookmarks',
             JSON.stringify(series)
@@ -588,8 +584,30 @@ async function sendSeriesBrowse(letter) {
     }
 }
 
+//#region Menu
+const menu = [
+    ...(isMac ? [{ role: 'appMenu' }] : []),
+    ...(isDev
+        ? [
+              {
+                  label: 'Developer',
+                  submenu: [
+                      { role: 'reload' },
+                      { role: 'forcereload' },
+                      { type: 'separator' },
+                      { role: 'toggledevtools' },
+                  ],
+              },
+          ]
+        : []),
+];
+//#endregion
+
 app.on('ready', () => {
     createMainWindow();
+
+    const mainMenu = Menu.buildFromTemplate(menu);
+    Menu.setApplicationMenu(mainMenu);
 });
 
 app.whenReady().then(() => {
