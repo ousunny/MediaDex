@@ -48,14 +48,7 @@ const MediaAdd = ({ open, onClose }) => {
     const [mediaPath, setMediaPath] = useState('');
     const [summary, setSummary] = useState('');
     const [tags, setTags] = useState([]);
-    const [episodes, setEpisodes] = useState([
-        {
-            index: 0,
-            filePath: '',
-            filename: '',
-            episodeNumber: 0,
-        },
-    ]);
+    const [episodes, setEpisodes] = useState([]);
     const loaded = React.useRef(false);
 
     useEffect(() => {
@@ -66,35 +59,39 @@ const MediaAdd = ({ open, onClose }) => {
             });
 
             ipcRenderer.on('media:select', (event, paths) => {
-                const directoryPath = JSON.parse(paths)[0];
-                setMediaPath(directoryPath);
+                if (JSON.parse(paths).length > 0) {
+                    const directoryPath = JSON.parse(paths)[0];
+                    setMediaPath(directoryPath);
 
-                fs.readdir(directoryPath, (err, filenames) => {
-                    const filteredEpisodes = filenames.reduce(
-                        (results, filename, index) => {
-                            if (exts.indexOf(path.extname(filename)) >= 0) {
-                                const episodeNumber = parseInt(
-                                    filename.split(' - ')[1].match(/[0-9]+/)[0]
-                                );
-
-                                results.push({
-                                    index,
-                                    filePath: path.join(
-                                        directoryPath,
+                    fs.readdir(directoryPath, (err, filenames) => {
+                        const filteredEpisodes = filenames.reduce(
+                            (results, filename, index) => {
+                                if (exts.indexOf(path.extname(filename)) >= 0) {
+                                    const episodeNumber = parseInt(
                                         filename
-                                    ),
-                                    filename,
-                                    episodeNumber,
-                                });
-                            }
+                                            .split(' - ')[1]
+                                            .match(/[0-9]+/)[0]
+                                    );
 
-                            return results;
-                        },
-                        []
-                    );
+                                    results.push({
+                                        index,
+                                        filePath: path.join(
+                                            directoryPath,
+                                            filename
+                                        ),
+                                        filename,
+                                        episodeNumber,
+                                    });
+                                }
 
-                    setEpisodes(filteredEpisodes);
-                });
+                                return results;
+                            },
+                            []
+                        );
+
+                        setEpisodes(filteredEpisodes);
+                    });
+                }
             });
             //#endregion
             loaded.current = true;
@@ -144,10 +141,21 @@ const MediaAdd = ({ open, onClose }) => {
             ...currentEpisodes[episodeIndex],
             episodeNumber: event.target.value,
         };
+
         setEpisodes(currentEpisodes);
     };
 
     const handleClose = () => {
+        setTitle('');
+        setCurrentSeason(1);
+        setAiringSeason('winter');
+        setAiringYear(new Date().getFullYear());
+        setImagePath('');
+        setMediaPath('');
+        setSummary('');
+        setTags([]);
+        setEpisodes([]);
+
         onClose();
     };
 
@@ -182,9 +190,7 @@ const MediaAdd = ({ open, onClose }) => {
         setMediaPath('');
         setSummary('');
         setTags([]);
-        setEpisodes([
-            { index: 0, filePath: '', filename: '', episodeNumber: 0 },
-        ]);
+        setEpisodes([]);
 
         onClose();
     };
@@ -268,7 +274,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 fullWidth
                                 placeholder="Path to image..."
                                 disabled
-                                value={imagePath}
+                                value={imagePath || ''}
                             />
                         </Grid>
                         <Grid item xs={4}>
@@ -287,7 +293,7 @@ const MediaAdd = ({ open, onClose }) => {
                                 fullWidth
                                 placeholder="Path to media..."
                                 disabled
-                                value={mediaPath}
+                                value={mediaPath || ''}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -317,41 +323,48 @@ const MediaAdd = ({ open, onClose }) => {
                             />
                         </Grid>
 
-                        <Grid container item spacing={3}>
-                            <Grid item>
-                                <Typography variant="h6">Episodes</Typography>
-                            </Grid>
-
-                            {episodes.map((episode, index) => (
-                                <Grid
-                                    container
-                                    item
-                                    xs={12}
-                                    key={index}
-                                    spacing={1}
-                                >
-                                    <Grid item xs={11}>
-                                        <TextField
-                                            disabled
-                                            fullWidth
-                                            value={episode.filename}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={1}>
-                                        <TextField
-                                            fullWidth
-                                            value={episode.episodeNumber}
-                                            onChange={(event) =>
-                                                handleEpisodeChange(
-                                                    event,
-                                                    index
-                                                )
-                                            }
-                                        />
-                                    </Grid>
+                        {episodes.length > 0 && (
+                            <Grid container item spacing={3}>
+                                <Grid item>
+                                    <Typography variant="h6">
+                                        Episodes
+                                    </Typography>
                                 </Grid>
-                            ))}
-                        </Grid>
+
+                                {episodes.length > 0 &&
+                                    episodes.map((episode) => (
+                                        <Grid
+                                            container
+                                            item
+                                            xs={12}
+                                            key={episode.index}
+                                            spacing={1}
+                                        >
+                                            <Grid item xs={11}>
+                                                <TextField
+                                                    disabled
+                                                    fullWidth
+                                                    value={episode.filename}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={1}>
+                                                <TextField
+                                                    fullWidth
+                                                    value={
+                                                        episode.episodeNumber
+                                                    }
+                                                    onChange={(event) =>
+                                                        handleEpisodeChange(
+                                                            event,
+                                                            episode.index
+                                                        )
+                                                    }
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    ))}
+                            </Grid>
+                        )}
                     </Grid>
                 </DialogContent>
                 <DialogActions>
