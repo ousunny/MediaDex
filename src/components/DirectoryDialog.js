@@ -78,7 +78,7 @@ const MediaAdd = ({ open, onClose, showId, directory }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Close</Button>
-                    <Button type="submit">Add</Button>
+                    <Button type="submit">Update</Button>
                 </DialogActions>
             </form>
         </Dialog>

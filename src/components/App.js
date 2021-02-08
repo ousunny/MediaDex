@@ -20,6 +20,7 @@ import {
     Bookmark,
     VideoLibrary,
     ArrowBack,
+    Settings as Cog,
 } from '@material-ui/icons';
 import SearchBar from './SearchBar';
 import Home from './Home';
@@ -27,6 +28,7 @@ import Bookmarks from './Bookmarks';
 import Browse from './Browse';
 import MediaAdd from './MediaAdd';
 import SeriesDetailView from './SeriesDetailView';
+import Settings from './Settings';
 import clsx from 'clsx';
 import { ipcRenderer } from 'electron';
 
@@ -121,6 +123,9 @@ const useStyles = makeStyles((theme) => ({
         padding: '1rem',
         height: '100%',
     },
+    cog: {
+        margin: '1rem 1rem 1rem auto',
+    },
 }));
 
 const App = () => {
@@ -131,9 +136,9 @@ const App = () => {
     const [seriesBrowse, setSeriesBrowse] = useState([]);
     const [nav, setNav] = useState(0);
     const [addOpen, setAddOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
     const [detailView, setDetailView] = useState(false);
     const [detailShow, setDetailShow] = useState(null);
-    const [currentShowId, setCurrentShowId] = useState(-1);
     const loaded = React.useRef(false);
 
     useEffect(() => {
@@ -173,6 +178,10 @@ const App = () => {
 
     const handleAddClick = () => {
         addOpen ? setAddOpen(false) : setAddOpen(true);
+    };
+
+    const handleSettingsClick = () => {
+        settingsOpen ? setSettingsOpen(false) : setSettingsOpen(true);
     };
 
     function displayDetailView(display, show) {
@@ -235,6 +244,9 @@ const App = () => {
                         </ListItem>
                     ))}
                 </List>
+                <Button className={classes.cog} onClick={handleSettingsClick}>
+                    <Cog fontSize="large" />
+                </Button>
             </Drawer>
             <main className={classes.content}>
                 {!detailView ? (
@@ -281,6 +293,7 @@ const App = () => {
             </main>
 
             <MediaAdd open={addOpen} onClose={handleAddClick} />
+            <Settings open={settingsOpen} onClose={handleSettingsClick} />
         </ThemeProvider>
     );
 };

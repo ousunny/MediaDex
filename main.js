@@ -365,6 +365,26 @@ ipcMain.on('series:bookmark', async (event, bookmark) => {
     }
 });
 
+ipcMain.on('tags:load', async (event) => {
+    try {
+        const tags = await models.Tags.findAll();
+        mainWindow.webContents.send('tags:get', JSON.stringify(tags));
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+ipcMain.on('tags:delete', async (event, id) => {
+    try {
+        await models.Tags.destroy({ where: { id } });
+
+        const tags = await models.Tags.findAll();
+        mainWindow.webContents.send('tags:get', JSON.stringify(tags));
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 ipcMain.on('image:click', async (event) => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openFile'],
