@@ -1,7 +1,7 @@
 {
     "name": "MediaDex",
     "productName": "MediaDex",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Front-end interface for media files",
     "main": "main.js",
     "scripts": {
@@ -9,7 +9,7 @@
         "start": "cross-env NODE_ENV=development webpack serve --hot --host 0.0.0.0 --config=./webpack.dev.config.js --mode development",
         "build": "cross-env NODE_ENV=production webpack --config webpack.build.config.js --mode production",
         "package": "npm run build",
-        "postpackage": "electron-packager ./ --out=./release-builds"
+        "postpackage": "electron-packager ./ --out=./release-builds --overwrite"
     },
     "author": "Sunny Ou",
     "license": "MIT",
