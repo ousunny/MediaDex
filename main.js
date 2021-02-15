@@ -280,8 +280,9 @@ ipcMain.on('series:directory_change', async (event, update) => {
         fs.readdir(update.directory_location, async (err, filenames) => {
             const episodes = filenames.reduce((results, filename) => {
                 if (exts.indexOf(path.extname(filename)) >= 0) {
+                    const splitFilename = filename.split('-');
                     const episodeNumber = parseInt(
-                        filename.split(' - ')[1].match(/[0-9]+/)[0]
+                        splitFilename[splitFilename.length - 1].match(/\d+/)[0]
                     );
 
                     results.push({

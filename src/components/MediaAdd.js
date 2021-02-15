@@ -67,10 +67,11 @@ const MediaAdd = ({ open, onClose }) => {
                         const filteredEpisodes = filenames.reduce(
                             (results, filename, index) => {
                                 if (exts.indexOf(path.extname(filename)) >= 0) {
+                                    const splitFilename = filename.split('-');
                                     const episodeNumber = parseInt(
-                                        filename
-                                            .split(' - ')[1]
-                                            .match(/[0-9]+/)[0]
+                                        splitFilename[
+                                            splitFilename.length - 1
+                                        ].match(/\d+/)[0]
                                     );
 
                                     results.push({
