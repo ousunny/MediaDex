@@ -435,6 +435,7 @@ async function sendSeriesDetails(showId) {
                 },
             ],
             where: { id: showId },
+            order: [[models.Episodes, 'number']],
         });
 
         mainWindow.webContents.send('series:get_details', JSON.stringify(show));
