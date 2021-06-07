@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const log = require('electron-log');
 const { app, BrowserWindow } = require('electron');
 const { Sequelize, Op } = require('sequelize');
 const { ipcMain, dialog, protocol, shell, Menu } = require('electron');
@@ -136,6 +137,7 @@ ipcMain.on('series:load_bookmarks', async () => {
 
 ipcMain.on('series:add', async (e, show) => {
     try {
+        log.info(show);
         await models.Series.create({
             title: show.title,
             airing_season: show.airing_season,
@@ -187,6 +189,7 @@ ipcMain.on('series:add', async (e, show) => {
         sendLatestSeries(4);
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -264,6 +267,7 @@ ipcMain.on('series:edit', async (event, show) => {
         sendSeriesDetails(show.id);
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -304,6 +308,7 @@ ipcMain.on('series:directory_change', async (event, update) => {
         sendSeriesDetails(update.id);
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -344,6 +349,7 @@ ipcMain.on('series:search', async (event, term) => {
         );
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -361,6 +367,7 @@ ipcMain.on('series:bookmark', async (event, bookmark) => {
         sendSeriesDetails(bookmark.seriesId);
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -370,6 +377,7 @@ ipcMain.on('tags:load', async (event) => {
         mainWindow.webContents.send('tags:get', JSON.stringify(tags));
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -381,6 +389,7 @@ ipcMain.on('tags:delete', async (event, id) => {
         mainWindow.webContents.send('tags:get', JSON.stringify(tags));
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 });
 
@@ -442,6 +451,7 @@ async function sendSeriesDetails(showId) {
         mainWindow.webContents.send('series:get_details', JSON.stringify(show));
     } catch (err) {
         console.log(err);
+        log.error(err);
     }
 }
 
@@ -498,6 +508,8 @@ async function sendLatestSeries(amount) {
         });
 
         series = series.slice(0, amount);
+
+        log.info(series);
 
         mainWindow.webContents.send(
             'series:get_latest',
