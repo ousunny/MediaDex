@@ -589,6 +589,8 @@ async function sendSeriesBrowse(letter) {
 //#region Menu
 const menu = [
     ...(isMac ? [{ role: 'appMenu' }] : []),
+    { role: 'fileMenu' },
+    { role: 'editMenu' },
     ...(isDev
         ? [
               {
